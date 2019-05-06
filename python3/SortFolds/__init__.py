@@ -63,7 +63,7 @@ def get_start_lines_of_folds_intersecting_current_range():
         int.
     """
     old_cursor = vim.current.window.cursor
-    fold_head = move_cursor('[z')
+    fold_head = vim.current.range.start
     while fold_head <= vim.current.range.end:
         yield fold_head
         next_fold_head = move_cursor('zj')
