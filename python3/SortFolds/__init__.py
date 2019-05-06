@@ -26,38 +26,23 @@ class Fold():
         Args:
             start_line_num: int. Line number where the fold starts (inclusive).
             end_line_num: int. Line number where the fold ends (exclusive).
-
-        Raises:
-            IndexError: When start_line_num is greater than end_line_num.
         """
-        if start_line_num > end_line_num:
-            raise IndexError(f'start must be greater than end, but got: '
-                             f'start={start_line_num} and end={end_line_num}')
         self.start = start_line_num - 1
         self.end = end_line_num - 1
 
-    def __len__(self):
-        return self.end - self.start
-
     def __getitem__(self, i):
-        if 0 <= i < len(self):
-            return vim.current.buffer[self.start + i]
-        raise IndexError(f'index={i} not in range: [{self.start}, {self.end})')
-
-    def __repr__(self):
-        return 'Fold(' + '\n\t'.join(repr(line) for line in self) + ')'
+        return vim.current.buffer[self.start + i]
 
 
-def sort_folds(line_num_key=1):
+def sort_folds(index_key=0):
     """Sorts the folds enclosed by the current range.
 
     Args:
-        line_num_key: int. The line number used to give folds their ordering.
+        index_key: int. The line index used to give folds their ordering.
     """
     initial_buf = list(vim.current.buffer)
     initial_folds = list(Fold(*r) for r in get_fold_ranges_in_current_range())
-    sorted_folds = (
-        sorted(initial_folds, key=operator.itemgetter(line_num_key - 1)))
+    sorted_folds = sorted(initial_folds, key=operator.itemgetter(index_key))
 
     for dst, src in reversed(list(zip(initial_folds, sorted_folds))):
         vim.current.buffer[dst.start:dst.end] = initial_buf[src.start:src.end]
@@ -68,8 +53,8 @@ def get_fold_ranges_in_current_range():
     """Yields the fold ranges found within the current range.
 
     Yields:
-        (int, int). The starting (inclusive) and ending (exclusive) line numbers
-            of a fold.
+        tuple(int, int). The starting (inclusive) and ending (exclusive) line
+            numbers of a fold.
     """
     with restore_cursor():
         next_fold_start = move_to_first_fold_of_range()
