@@ -70,7 +70,6 @@ def cursor_restorer():
         vim.current.window.cursor = initial_cursor
 
 
-@cursor_restorer()
 def iter_fold_ranges():
     """Yields the fold ranges found within the current range.
 
@@ -78,18 +77,18 @@ def iter_fold_ranges():
         tuple(int, int). The starting (inclusive) and ending (exclusive) line
             numbers of a fold.
     """
-    cursor = move_to_first_fold()
-    if cursor is None:
-        return
-    while cursor < vim.current.range.end:
-        vim.command('normal! zo')
-        fold_start = cursor
-        fold_end = perform_motion(']z') + 1
-        yield (fold_start, fold_end)
+    with cursor_restorer():
+        cursor = move_to_first_fold()
+        if cursor is None:
+            return
+        while cursor < vim.current.range.end:
+            vim.command('normal! zo')
+            start, end = cursor, perform_motion(']z') + 1
+            yield (start, end)
 
-        cursor = perform_motion('zj')
-        if cursor == fold_start or fold_level(cursor) != fold_level(fold_start):
-            break
+            cursor = perform_motion('zj')
+            if cursor == start or fold_level(cursor) != fold_level(start):
+                break
 
 
 def move_to_first_fold():
