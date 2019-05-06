@@ -42,39 +42,41 @@ def sort_folds(key_line=1):
     Args:
         key_line: int. The line number used to give folds an ordering.
     """
-    old_folds = list(get_folds_intersecting_current_range())
+    old_folds = list(Fold(*s) for s in get_spans_of_folds_in_current_range())
     sorted_folds = sorted(old_folds, key=operator.itemgetter(key_line - 1))
 
     old_buffer = list(vim.current.buffer)
     folds_to_swap = list(zip(old_folds, sorted_folds))
     for dst, src in reversed(folds_to_swap):
         vim.current.buffer[dst.start:dst.end] = old_buffer[src.start:src.end]
+    perform_motion('zx')
 
 
-def get_folds_intersecting_current_range():
-    """Yields all folds intersecting the currently selected range."""
-    return (
-        Fold(s, e) for s, e in get_spans_of_folds_intersecting_current_range())
-
-
-def get_spans_of_folds_intersecting_current_range():
+def get_spans_of_folds_in_current_range():
     """Yields starting line numbers of all folds intersecting the current range.
 
     Yields:
-        int.
+        (int, int).
     """
     with restore_cursor():
+        # Positioning the cursor at the start of a fold.
         next_fold_start = perform_motion(None)
-        while next_fold_start <= vim.current.range.end:
+        if not fold_level(next_fold_start):
+            next_fold_start = perform_motion('zj')
+        if not fold_level(next_fold_start):
+            return
+        if fold_level(next_fold_start - 1) == fold_level(next_fold_start):
+            perform_motion('zo' '[z')
+
+        while next_fold_start < vim.current.range.end:
             fold_start = next_fold_start
-            fold_end = perform_motion('zo' ']z' 'zc') + 1
+            fold_end = perform_motion('zo' ']z') + 1
             yield (fold_start, fold_end)
 
             next_fold_start = perform_motion('zj')
-            if next_fold_start == fold_start:
-                break
-            elif fold_level(next_fold_start) != fold_level(fold_start):
-                break
+            if (next_fold_start == fold_start or
+                    fold_level(next_fold_start) != fold_level(fold_start)):
+                return
 
 
 @contextlib.contextmanager
