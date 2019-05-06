@@ -5,7 +5,7 @@
 Maintainer:	Brian Rodriguez
 """
 import contextlib
-import copy
+import itertools
 import operator
 import vim
 
@@ -37,8 +37,16 @@ class Fold():
         self.start = start_line_num - 1
         self.end = end_line_num - 1
 
-    def __getitem__(self, index):
-        return vim.current.buffer[self.start + index]
+    def __len__(self):
+        return self.end - self.start
+
+    def __getitem__(self, i):
+        if 0 <= i < len(self):
+            return vim.current.buffer[self.start + i]
+        raise IndexError(f'index={i} not in range: [{self.start}, {self.end})')
+
+    def __repr__(self):
+        return 'Fold(' + '\n\t'.join(repr(line) for line in self) + ')'
 
 
 def sort_folds(line_num_key=1):
@@ -47,10 +55,9 @@ def sort_folds(line_num_key=1):
     Args:
         line_num_key: int. The line number used to give folds their ordering.
     """
-    initial_buf = vim.current.buffer.tolist()
+    initial_buf = list(vim.current.buffer)
     initial_folds = list(Fold(*r) for r in get_fold_ranges_in_current_range())
-    sorted_folds = (
-        sorted(initial_folds, key=operator.itemgetter(line_num_key - 1)))
+    sorted_folds = sorted(initial_folds, key=operator.itemgetter(0))
 
     for dst, src in reversed(list(zip(initial_folds, sorted_folds))):
         vim.current.buffer[dst.start:dst.end] = initial_buf[src.start:src.end]
@@ -94,9 +101,9 @@ def move_to_first_fold_of_range():
         return None
     vim.command('normal! zo')
     with restore_cursor():
-        upper_level = fold_level(perform_motion('[z'))
-    fold_start = (
-        perform_motion('[z' if fold_level(fold_start) == upper_level else ']z'))
+        containing_fold_level = fold_level(perform_motion('[z'))
+    if fold_level(fold_start) == containing_fold_level:
+        perform_motion('[z')
     if vim.current.range.start <= fold_start < vim.current.range.end:
         return fold_start
     return None
