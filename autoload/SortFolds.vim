@@ -7,6 +7,6 @@ py3 import vim
 py3 import SortFolds
 
 function! SortFolds#SortFolds(...) range
-  silent execute a:firstline . ',' . a:lastline . \
-                   ' py3 SortFolds.sort_folds(' . get(a:, 0, 0) . ')'
+  silent execute a:firstline . ',' . a:lastline .
+                 \ ' py3 SortFolds.sort_folds(' . get(a:, 0, 0) . ')'
 endfunction
