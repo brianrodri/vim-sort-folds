@@ -5,17 +5,11 @@
 let s:save_cpo = &cpo
 set cpo&vim
 
-if exists('g:loaded_sort_folds')
-  finish
-endif
-
-if !has('python3_compiled') || !has('python3')
+if !has('python3')
   echohl WarningMsg
   echom 'SortFolds requires +python3.'
   finish
 endif
-
-let g:loaded_sort_folds = 1
 
 let &cpo = s:save_cpo
 unlet s:save_cpo

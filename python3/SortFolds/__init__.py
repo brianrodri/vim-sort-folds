@@ -13,7 +13,7 @@ __version__ = '0.1.1'
 
 
 class Fold():
-    """Represents a foldable sequence of lines in the current buffer.
+    """Encapsulates a folded sequence of lines in the current buffer.
 
     Attributes:
         start: int. The buffer index at which the fold starts (inclusive).
@@ -34,30 +34,30 @@ class Fold():
         return vim.current.buffer[self.start + i]
 
 
-def sort_folds(index_key=0):
-    """Sorts the folds enclosed by the current range.
+def sort_folds(line_num):
+    """Sorts folds enclosed in the current range.
 
     Args:
-        index_key: int. The line index used to give folds their ordering.
+        line_num: int. The line number used to give folds their ordering.
     """
-    initial_buf = list(vim.current.buffer)
-    initial_folds = list(Fold(*r) for r in get_fold_ranges_in_current_range())
-    sorted_folds = sorted(initial_folds, key=operator.itemgetter(index_key))
+    buf = list(vim.current.buffer)
+    folds = list(Fold(*r) for r in get_fold_ranges())
+    sorted_folds = sorted(folds, key=operator.itemgetter(line_num - 1))
 
-    for dst, src in reversed(list(zip(initial_folds, sorted_folds))):
-        vim.current.buffer[dst.start:dst.end] = initial_buf[src.start:src.end]
+    for dst, src in reversed(list(zip(folds, sorted_folds))):
+        vim.current.buffer[dst.start:dst.end] = buf[src.start:src.end]
     vim.command('normal! zx')
 
 
-def get_fold_ranges_in_current_range():
+def get_fold_ranges():
     """Yields the fold ranges found within the current range.
 
     Yields:
         tuple(int, int). The starting (inclusive) and ending (exclusive) line
             numbers of a fold.
     """
-    with restore_cursor():
-        next_fold_start = move_to_first_fold_of_range()
+    with new_cursor_scope():
+        next_fold_start = perform_motion_to_first_fold()
         if next_fold_start is None:
             return
         while next_fold_start < vim.current.range.end:
@@ -72,7 +72,7 @@ def get_fold_ranges_in_current_range():
                 break
 
 
-def move_to_first_fold_of_range():
+def perform_motion_to_first_fold():
     """Places the cursor at the first fold in the current range.
 
     Returns:
@@ -86,9 +86,9 @@ def move_to_first_fold_of_range():
         return None
 
     vim.command('normal! zo')
-    with restore_cursor():
-        outer_fold_level = fold_level(perform_motion('[z'))
-    perform_motion('[z' if fold_level(fold_start) == outer_fold_level else None)
+    with new_cursor_scope():
+        outer_level = fold_level(perform_motion('[z'))
+    perform_motion('[z' if fold_level(fold_start) == outer_level else None)
 
     if vim.current.range.start <= fold_start < vim.current.range.end:
         return fold_start
@@ -96,13 +96,13 @@ def move_to_first_fold_of_range():
 
 
 @contextlib.contextmanager
-def restore_cursor():
+def new_cursor_scope():
     """Context manager to restore the cursor's position after closing."""
-    initial_cursor = vim.current.window.cursor
+    cursor = vim.current.window.cursor
     try:
         yield
     finally:
-        vim.current.window.cursor = initial_cursor
+        vim.current.window.cursor = cursor
 
 
 def perform_motion(motion):
