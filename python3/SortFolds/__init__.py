@@ -65,7 +65,7 @@ def get_fold_starting_positions():
     """Yields the starting line numbers of all folds in the current range."""
     initial_cursor = vim.current.window.cursor
     range_start, range_end = vim.current.range.start, vim.current.range.end + 1
-    fold_start = range_begin
+    fold_start = range_start
     while fold_start < range_end:
         yield fold_start
         vim.command('normal! zj')
