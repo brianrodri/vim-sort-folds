@@ -45,7 +45,7 @@ class Fold():
         raise IndexError(f'index={i} must be in the range [0, len={len(self)})')
 
 
-def sort_folds(line_num):
+def sort_folds(line_num=1):
     """Sorts folds enclosed in the current range.
 
     Args:
