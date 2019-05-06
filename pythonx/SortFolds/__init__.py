@@ -1,15 +1,13 @@
 #!/usr/bin/env python3
 # encoding: utf-8
-#
-# SortFolds/__init__.py - Sort closed folds based on first line
-# Maintainer: Brian Rodriguez
-#
-import itertools
-import vim
+"""Sort closed folds based on their first line.
 
+Maintainer:		Brian Rodriguez
+"""
+import itertools
 
 __all__ = ["debug", "print_foldlevel", "sort_folds"]
-__version__ = "0.2.1"
+__version__ = "0.3.0"
 
 
 class Fold():

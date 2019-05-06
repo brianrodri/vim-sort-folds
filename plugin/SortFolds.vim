@@ -1,6 +1,6 @@
 " SortFolds.vim - Sort closed folds based on first line
-" Maintainer:   Oliver Breitwieser
-" Version:      0.2.0
+" Maintainer:   Brian Rodriguez
+" Version:      0.3.0
 " License:      MIT license
 
 if exists("g:loaded_sort_folds")
