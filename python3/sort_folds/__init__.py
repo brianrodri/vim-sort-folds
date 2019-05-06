@@ -45,14 +45,14 @@ class Fold():
         raise IndexError(f'index={i} must be in the range [0, len={len(self)})')
 
 
-def sort_folds(line_num=1):
+def sort_folds(line_index=0):
     """Sorts folds enclosed in the current range.
 
     Args:
-        line_num: int. The line number used to give folds their ordering.
+        line_index: int. The index to the line which gives folds their ordering.
     """
     initial_folds = list(Fold(*r) for r in iter_fold_ranges())
-    sorted_folds = sorted(initial_folds, key=operator.itemgetter(line_num - 1))
+    sorted_folds = sorted(initial_folds, key=operator.itemgetter(line_index))
 
     initial_buffer, current_buffer = vim.current.buffer[:], vim.current.buffer
     for dst, src in reversed(list(zip(initial_folds, sorted_folds))):
