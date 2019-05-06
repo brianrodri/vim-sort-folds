@@ -5,6 +5,7 @@
 Maintainer:	Brian Rodriguez
 """
 import contextlib
+import functools
 import itertools
 import operator
 import vim
@@ -103,6 +104,7 @@ def perform_motion(motion):
     return int(vim.eval('line(".")'))
 
 
+@functools.lru_cache(maxsize=None)
 def fold_level(line_number):
     """Returns the fold level at the given line number."""
     return int(vim.eval(f'foldlevel({line_number})'))
