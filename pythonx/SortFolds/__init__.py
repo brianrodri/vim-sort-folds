@@ -5,6 +5,7 @@
 Maintainer:		Brian Rodriguez
 """
 import itertools
+import vim
 
 __all__ = ["debug", "print_foldlevel", "sort_folds"]
 __version__ = "0.3.0"
