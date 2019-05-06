@@ -41,7 +41,7 @@ class Fold():
 
     def __getitem__(self, i):
         if 0 <= i < len(self):
-            return vim.current.buffer[self.start + i]
+            return vim.current.buffer[self.start + i].lower()
         raise IndexError(f'index={i} must be in the range [0, len={len(self)})')
 
 
