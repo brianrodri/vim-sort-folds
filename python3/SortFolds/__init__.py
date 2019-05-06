@@ -4,7 +4,6 @@
 
 Maintainer:	Brian Rodriguez
 """
-import dataclasses
 import itertools
 import operator
 import vim
