@@ -64,15 +64,27 @@ def get_spans_of_folds_intersecting_current_range():
         int.
     """
     with restore_cursor():
-        at_last_fold = False
         next_fold_start = perform_motion(None)
-        while not at_last_fold and next_fold_start <= vim.current.range.end:
-            fold_start, next_fold_start = next_fold_start, perform_motion('zj')
-            if next_fold_start == fold_start:
-                at_last_fold = True
-            with restore_cursor():
-                fold_end = perform_motion('zo' ']z' 'zc' 'zX') + 1
+        while next_fold_start <= vim.current.range.end:
+            fold_start = next_fold_start
+            fold_end = perform_motion('zo' ']z' 'zc') + 1
             yield (fold_start, fold_end)
+
+            next_fold_start = perform_motion('zj')
+            if next_fold_start == fold_start:
+                break
+            elif fold_level(next_fold_start) != fold_level(fold_start):
+                break
+
+
+@contextlib.contextmanager
+def restore_cursor():
+    """Context manager to restore the cursor's position after closing."""
+    old_cursor = vim.current.window.cursor
+    try:
+        yield
+    finally:
+        vim.current.window.cursor = old_cursor
 
 
 def perform_motion(motion):
@@ -89,11 +101,6 @@ def perform_motion(motion):
     return int(vim.eval('line(".")'))
 
 
-@contextlib.contextmanager
-def restore_cursor():
-    """Context manager to restore the cursor's position after closing."""
-    old_cursor = vim.current.window.cursor
-    try:
-        yield
-    finally:
-        vim.current.window.cursor = old_cursor
+def fold_level(line_number):
+    """Returns the fold level at the given line number."""
+    return int(vim.eval(f'foldlevel({line_number})'))
