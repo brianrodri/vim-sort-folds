@@ -38,7 +38,7 @@ class Fold():
         return vim.current.buffer[self._start + i]
 
     @property
-    def slice(self):
+    def buf_slice(self):
         """Returns a slice for indexing the folded lines in the buffer."""
         return slice(self._start, self._end, 1)
 
@@ -51,7 +51,7 @@ def sort_folds(key_line_number=0):
 
     # Move sorted folds into the positions of the initial folds.
     for old_fold, new_fold in reversed(tuple(zip(initial_folds, sorted_buf))):
-        vim.current.buffer[old_fold.slice] = initial_buf[new_fold.slice]
+        vim.current.buffer[old_fold.buf_slice] = initial_buf[new_fold.buf_slice]
 
 
 def get_folds():
