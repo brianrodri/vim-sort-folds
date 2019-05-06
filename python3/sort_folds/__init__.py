@@ -9,7 +9,7 @@ import operator
 import vim
 
 __all__ = ['sort_folds']
-__version__ = '0.1.1'
+__version__ = '0.3.0'
 
 
 class Fold():
@@ -26,12 +26,23 @@ class Fold():
         Args:
             start_line_num: int. Line number where the fold starts (inclusive).
             end_line_num: int. Line number where the fold ends (exclusive).
+
+        Raises:
+            IndexError: when end_line_num is less than start_line_num.
         """
+        if end_line_num < start_line_num:
+            raise IndexError(f'end must not be less than start, but got: '
+                             f'end={end_line_num} and start={start_line_num}')
         self.start = start_line_num - 1
         self.end = end_line_num - 1
 
+    def __len__(self):
+        return self.end - self.start
+
     def __getitem__(self, i):
-        return vim.current.buffer[self.start + i]
+        if 0 <= i < len(self):
+            return vim.current.buffer[self.start + i]
+        raise IndexError(f'index={i} must be in the range [0, len={len(self)})')
 
 
 def sort_folds(line_num):
@@ -40,73 +51,73 @@ def sort_folds(line_num):
     Args:
         line_num: int. The line number used to give folds their ordering.
     """
-    buf = list(vim.current.buffer)
-    folds = list(Fold(*r) for r in get_fold_ranges())
-    sorted_folds = sorted(folds, key=operator.itemgetter(line_num - 1))
+    initial_folds = list(Fold(*r) for r in iter_fold_ranges())
+    sorted_folds = sorted(initial_folds, key=operator.itemgetter(line_num - 1))
 
-    for dst, src in reversed(list(zip(folds, sorted_folds))):
-        vim.current.buffer[dst.start:dst.end] = buf[src.start:src.end]
+    initial_buffer, current_buffer = vim.current.buffer[:], vim.current.buffer
+    for dst, src in reversed(list(zip(initial_folds, sorted_folds))):
+        current_buffer[dst.start:dst.end] = initial_buffer[src.start:src.end]
     vim.command('normal! zx')
 
 
-def get_fold_ranges():
+@contextlib.contextmanager
+def cursor_restorer():
+    """Context manager to restore the opening cursor position after exiting."""
+    initial_cursor = vim.current.window.cursor
+    try:
+        yield
+    finally:
+        vim.current.window.cursor = initial_cursor
+
+
+@cursor_restorer
+def iter_fold_ranges():
     """Yields the fold ranges found within the current range.
 
     Yields:
         tuple(int, int). The starting (inclusive) and ending (exclusive) line
             numbers of a fold.
     """
-    with new_cursor_scope():
-        next_fold_start = perform_motion_to_first_fold()
-        if next_fold_start is None:
-            return
-        while next_fold_start < vim.current.range.end:
-            vim.command('normal! zo')
-            fold_start = next_fold_start
-            fold_end = perform_motion(']z') + 1
-            yield (fold_start, fold_end)
+    cursor = move_to_first_fold()
+    if cursor is None:
+        return
+    while cursor < vim.current.range.end:
+        vim.command('normal! zo')
+        fold_start = cursor
+        fold_end = perform_motion(']z') + 1
+        yield (fold_start, fold_end)
 
-            next_fold_start = perform_motion('zj')
-            if (next_fold_start == fold_start or
-                    fold_level(next_fold_start) != fold_level(fold_start)):
-                break
+        cursor = perform_motion('zj')
+        if cursor == fold_start or fold_level(cursor) != fold_level(fold_start):
+            break
 
 
-def perform_motion_to_first_fold():
-    """Places the cursor at the first fold in the current range.
+def move_to_first_fold():
+    """Places the cursor at the first fold within the current range.
 
     Returns:
-        int or None. The line number of the cursor, or None if no folds are
-            enclosed by the range.
+        int or None. Line number of the first fold or None if no folds exist.
     """
-    fold_start = perform_motion(None)
-    if not fold_level(fold_start):
-        fold_start = perform_motion('zj')
-    if not fold_level(fold_start):
-        return None
+    cursor = perform_motion(None)
+    if not fold_level(cursor):
+        cursor = perform_motion('zj')
+        if not fold_level(cursor):
+            return None
 
     vim.command('normal! zo')
-    with new_cursor_scope():
-        outer_level = fold_level(perform_motion('[z'))
-    perform_motion('[z' if fold_level(fold_start) == outer_level else None)
+    with cursor_restorer():
+        is_cursor_at_fold_start = (
+            fold_level(cursor) != fold_level(perform_motion('[z')))
+    perform_motion(None if is_cursor_at_fold_start else '[z')
 
-    if vim.current.range.start <= fold_start < vim.current.range.end:
-        return fold_start
-    return None
-
-
-@contextlib.contextmanager
-def new_cursor_scope():
-    """Context manager to restore the cursor's position after closing."""
-    cursor = vim.current.window.cursor
-    try:
-        yield
-    finally:
-        vim.current.window.cursor = cursor
+    if vim.current.range.start <= cursor < vim.current.range.end:
+        return cursor
+    else:
+        return None
 
 
 def perform_motion(motion):
-    """Applies the given motion on the cursor.
+    """Applies the given motion to the cursor.
 
     Args:
         motion: str or None. The motion to perform.
@@ -120,5 +131,12 @@ def perform_motion(motion):
 
 
 def fold_level(line_num):
-    """Returns the fold level at the given line number."""
+    """Returns the fold level of the given line number.
+
+    Args:
+        line_num: int.
+
+    Returns:
+        int. The fold-level of the given line number.
+    """
     return int(vim.eval(f'foldlevel({line_num})'))
