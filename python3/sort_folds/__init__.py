@@ -61,7 +61,7 @@ def sort_folds(line_index=0):
     # Present the result.
     vim.command('normal! zxzC')
     level = fold_level(perform_motion(None))
-    if level > 1:
+    if level:
         vim.command(f'normal! {level}zo')
 
 
