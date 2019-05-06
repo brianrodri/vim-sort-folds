@@ -68,10 +68,12 @@ def get_spans_of_folds_intersecting_current_range():
         next_fold_start = perform_motion(None)
         while not at_last_fold and next_fold_start <= vim.current.range.end:
             fold_start, next_fold_start = next_fold_start, perform_motion('zj')
-            if next_fold_start == fold_start:
-                at_last_fold = True
             with restore_cursor():
-                fold_end = perform_motion(']z') + 1
+                if next_fold_start == fold_start:
+                    at_last_fold = True
+                    fold_end = perform_motion(']z') + 1
+                else:
+                    fold_end = perform_motion('zo]zzc') + 1
             yield (fold_start, fold_end)
 
 
