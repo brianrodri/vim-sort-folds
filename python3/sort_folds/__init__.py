@@ -70,7 +70,7 @@ def cursor_restorer():
         vim.current.window.cursor = initial_cursor
 
 
-@cursor_restorer
+@cursor_restorer()
 def iter_fold_ranges():
     """Yields the fold ranges found within the current range.
 
