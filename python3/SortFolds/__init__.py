@@ -59,25 +59,38 @@ def get_spans_of_folds_in_current_range():
         (int, int).
     """
     with restore_cursor():
-        # Try to place the cursor at the start of a fold.
-        next_fold_start = perform_motion(None)
-        if not fold_level(next_fold_start):
-            next_fold_start = perform_motion('zj')
-        if not fold_level(next_fold_start):
+        next_fold_start = move_to_first_fold_of_range()
+        if next_fold_start is None:
             return
-        elif fold_level(next_fold_start - 1) == fold_level(next_fold_start):
-            perform_motion('zo' '[z')
-
-        # Iterate through remaining folds at same level in the current range.
-        while next_fold_start <= vim.current.range.end:
+        while next_fold_start < vim.current.range.end:
+            vim.command('normal! zo')
             fold_start = next_fold_start
-            fold_end = perform_motion('zo' ']z') + 1
+            fold_end = perform_motion(']z') + 1
             yield (fold_start, fold_end)
 
             next_fold_start = perform_motion('zj')
             if (next_fold_start == fold_start or
                     fold_level(next_fold_start) != fold_level(fold_start)):
                 break
+
+
+def move_to_first_fold_of_range():
+    """Places the cursor at the first fold in the current range.
+
+    Returns:
+        int or None. The line number of the cursor, or None if no fold exists
+            within the range.
+    """
+    cursor = perform_motion(None)
+    if not fold_level(cursor):
+        cursor = perform_motion('zj')
+    if not fold_level(cursor):
+        return None
+
+    vim.command('normal! zo')
+    with restore_cursor():
+        upper_level = fold_level(perform_motion('[z'))
+    return perform_motion('[z' if fold_level(cursor) == upper_level else ']z')
 
 
 @contextlib.contextmanager
