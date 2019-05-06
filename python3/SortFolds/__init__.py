@@ -15,8 +15,7 @@ __version__ = '0.1.1'
 
 
 class Fold():
-    """Iterable representation of a folded sequence of lines in the current
-    buffer.
+    """Iterable representation of a folded sequence of lines in the buffer.
 
     Attributes:
         start: int. The buffer index at which the fold starts (inclusive).
@@ -50,7 +49,7 @@ def sort_folds(key_line_num=1):
     folds_to_swap = list(zip(old_folds, sorted_folds))
     for dst, src in reversed(folds_to_swap):
         vim.current.buffer[dst.start:dst.end] = old_buffer[src.start:src.end]
-    perform_motion('zx')
+    vim.command(f'normal! zx')
 
 
 def get_spans_of_folds_in_current_range():
@@ -60,16 +59,17 @@ def get_spans_of_folds_in_current_range():
         (int, int).
     """
     with restore_cursor():
-        # Positioning the cursor at the start of a fold.
+        # Try to place the cursor at the start of a fold.
         next_fold_start = perform_motion(None)
         if not fold_level(next_fold_start):
             next_fold_start = perform_motion('zj')
         if not fold_level(next_fold_start):
             return
-        if fold_level(next_fold_start - 1) == fold_level(next_fold_start):
+        elif fold_level(next_fold_start - 1) == fold_level(next_fold_start):
             perform_motion('zo' '[z')
 
-        while next_fold_start < vim.current.range.end:
+        # Iterate through remaining folds at same level in the current range.
+        while next_fold_start <= vim.current.range.end:
             fold_start = next_fold_start
             fold_end = perform_motion('zo' ']z') + 1
             yield (fold_start, fold_end)
@@ -77,7 +77,7 @@ def get_spans_of_folds_in_current_range():
             next_fold_start = perform_motion('zj')
             if (next_fold_start == fold_start or
                     fold_level(next_fold_start) != fold_level(fold_start)):
-                return
+                break
 
 
 @contextlib.contextmanager
@@ -104,7 +104,6 @@ def perform_motion(motion):
     return int(vim.eval('line(".")'))
 
 
-@functools.lru_cache(maxsize=None)
 def fold_level(line_num):
     """Returns the fold level at the given line number."""
     return int(vim.eval(f'foldlevel({line_num})'))
