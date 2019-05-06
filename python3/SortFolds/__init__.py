@@ -94,16 +94,21 @@ def move_to_first_fold_of_range():
         int or None. The line number of the cursor, or None if no folds are
             enclosed by the range.
     """
+    # Ensure a fold exists.
     fold_start = perform_motion(None)
     if not fold_level(fold_start):
         fold_start = perform_motion('zj')
     if not fold_level(fold_start):
         return None
+
+    # Ensure cursor is pointing to the start of the fold.
     vim.command('normal! zo')
     with restore_cursor():
         containing_fold_level = fold_level(perform_motion('[z'))
     if fold_level(fold_start) == containing_fold_level:
         perform_motion('[z')
+
+    # Ensure cursor is within the current range.
     if vim.current.range.start <= fold_start < vim.current.range.end:
         return fold_start
     return None
