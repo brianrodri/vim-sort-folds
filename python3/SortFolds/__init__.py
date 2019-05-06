@@ -53,7 +53,7 @@ def get_folds_intersecting_current_range():
     starts, ends = (
         itertools.tee(get_start_lines_of_folds_intersecting_current_range()))
     next(ends, None)
-    return map(Fold(start, end) for start, end in zip(starts, ends))
+    return (Fold(start, end) for start, end in zip(starts, ends))
 
 
 def get_start_lines_of_folds_intersecting_current_range():
