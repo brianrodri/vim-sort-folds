@@ -37,14 +37,14 @@ class Fold():
         return vim.current.buffer[self.start + i]
 
 
-def sort_folds(key_line=1):
+def sort_folds(key_line_num=1):
     """Sorts the folds intersecting the current range.
 
     Args:
-        key_line: int. The line number used to give folds an ordering.
+        key_line_num: int. The line number used to give folds an ordering.
     """
     old_folds = list(Fold(*s) for s in get_spans_of_folds_in_current_range())
-    sorted_folds = sorted(old_folds, key=operator.itemgetter(key_line - 1))
+    sorted_folds = sorted(old_folds, key=operator.itemgetter(key_line_num - 1))
 
     old_buffer = list(vim.current.buffer)
     folds_to_swap = list(zip(old_folds, sorted_folds))
@@ -105,6 +105,6 @@ def perform_motion(motion):
 
 
 @functools.lru_cache(maxsize=None)
-def fold_level(line_number):
+def fold_level(line_num):
     """Returns the fold level at the given line number."""
-    return int(vim.eval(f'foldlevel({line_number})'))
+    return int(vim.eval(f'foldlevel({line_num})'))
