@@ -37,21 +37,11 @@ class Fold():
     def __getitem__(self, i):
         return vim.current.buffer[self._start + i]
 
-    @property
-    def buf_slice(self):
-        """Returns a slice for indexing the folded lines in the buffer."""
-        return slice(self._start, self._end, 1)
-
 
 def sort_folds(key_line_number=0):
     """Sorts closed folds in the current range by the given line."""
-    initial_buf = tuple(vim.current.buffer)
-    initial_folds = tuple(get_folds())
-    sorted_buf = sorted(initial_folds, key=operator.itemgetter(key_line_number))
-
-    # Move sorted folds into the positions of the initial folds.
-    for old_fold, new_fold in reversed(tuple(zip(initial_folds, sorted_buf))):
-        vim.current.buffer[old_fold.buf_slice] = initial_buf[new_fold.buf_slice]
+    sorted_folds = sorted(get_folds(), key=operator.itemgetter(key_line_number))
+    vim.current.range[:] = list(itertools.chain.from_iterable(sorted_folds))
 
 
 def get_folds():
@@ -73,6 +63,6 @@ def get_fold_starting_positions():
         if fold_start < next_fold_start:
             fold_start = next_fold_start
         else:
-            break  # We've hit the last fold in the buffer.
+            break
     yield range_end
     vim.current.window.cursor = initial_cursor
