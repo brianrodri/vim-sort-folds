@@ -4,6 +4,7 @@
 
 Maintainer:	Brian Rodriguez
 """
+import contextlib
 import itertools
 import operator
 import vim
@@ -64,16 +65,16 @@ def get_spans_of_folds_intersecting_current_range():
     """
     with restore_cursor():
         at_last_fold = False
-        next_fold_head = perform_motion(None)
-        while not at_last_fold and next_fold_head <= vim.current.range.end:
-            fold_head, next_fold_head = next_fold_head, perform_motion('zj')
+        next_fold_start = perform_motion(None)
+        while not at_last_fold and next_fold_start <= vim.current.range.end:
+            fold_start, next_fold_start = next_fold_start, perform_motion('zj')
             with restore_cursor():
-                if fold_head == next_fold_head:
-                    fold_end = perform_motion(']z') + 1
+                if next_fold_start == fold_start:
                     at_last_fold = True
+                    fold_end = perform_motion(']z') + 1
                 else:
                     fold_end = perform_motion('zk') + 1
-            yield (fold_head, fold_end)
+            yield (fold_start, fold_end)
 
 
 def perform_motion(motion):
@@ -90,6 +91,7 @@ def perform_motion(motion):
     return int(vim.eval('line(".")'))
 
 
+@contextlib.contextmanager
 def restore_cursor():
     """Context manager to restore the cursor's position after closing."""
     old_cursor = vim.current.window.cursor
