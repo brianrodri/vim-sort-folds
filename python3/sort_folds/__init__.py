@@ -57,7 +57,7 @@ def sort_folds(line_index=0):
     initial_buffer, current_buffer = vim.current.buffer[:], vim.current.buffer
     for dst, src in reversed(list(zip(initial_folds, sorted_folds))):
         current_buffer[dst.start:dst.end] = initial_buffer[src.start:src.end]
-    vim.command('normal! zx')
+    vim.command('normal! zxzc')
 
 
 @contextlib.contextmanager
