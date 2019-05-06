@@ -1,27 +1,18 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 # encoding: utf-8
 #
 # SortFolds/__init__.py - Sort closed folds based on first line
-# Maintainer:   Oliver Breitwieser
+# Maintainer: Brian Rodriguez
 #
-
-from __future__ import print_function
-
-import itertools as it
-
+import itertools
 import vim
 
 
-__all__ = [
-        "debug",
-        "print_foldlevel"
-        "sort_folds",
-    ]
-
-__version__ = "0.2.0"
+__all__ = ["debug", "print_foldlevel", "sort_folds"]
+__version__ = "0.2.1"
 
 
-class Fold(object):
+class Fold():
     """
         Object representing a fold in the current buffer.
     """
@@ -73,7 +64,7 @@ def debug(sorting_line_number=1):
 
 def get_foldlevel(lineno):
     "Get foldlevel for given line number in current buffer."
-    return int(vim.eval("foldlevel({})".format(lineno)))
+    return int(vim.eval(f"foldlevel({lineno})"))
 
 
 def get_folds():
@@ -96,7 +87,7 @@ def get_folds():
         "Advance to next fold and return line number."
         normal("zj")
         # adjust for line numbers starting at one
-        return int(vim.eval("line('.')"))-1
+        return int(vim.eval("line('.')")) - 1
 
     while fold_end != cr.end:
         fold_end = min(next_fold(), cr.end)
@@ -138,59 +129,6 @@ def line_range_to_foldlevel(start, end):
     return map(get_foldlevel, range(start, end+1))
 
 
-def merge_folds(folds_gen):
-    """
-        Merge all folds that are more than one level below the lowest foldlevel
-        found.
-
-        This function is unneeded now because foldlevel-based method (see
-        _get_folds) does not work as intended. The now in-use method of
-        identifying folds relies on folds being closed, but on the other hand
-        does not require any merger of folds...
-    """
-    # copy iterator to find minimum fold level
-    find_min, folds_gen = it.tee(folds_gen)
-
-    # the folds we want to sort are one fold level above the minumum we found
-    level_to_sort = min(it.imap(lambda l: l.level, find_min)) + 1
-
-    # Depending on what range the user selects, vim will report a different
-    # foldlevel for the very first line, leading to undesired behavior.
-    # The invariant however is that the first fold should be at a fold level
-    # one below the sorting level. If it is not, we have to adjust accordingly.
-
-    fold = folds_gen.next()
-
-    to_merge = [fold]
-    level_last = fold.level
-
-    def make_fold(to_merge):
-        return Fold(level=level_to_sort,
-                    start=to_merge[0].start,
-                    length=sum(map(len, to_merge)))
-
-    for fold in folds_gen:
-        # we check for exact equality because we want to keep the space between
-        # folds aligned with the folds themselves. Otherwise we would have all
-        # the whitespace between functions in one place etc.
-        # The only time we want to merge a fold at sort level is if we return
-        # from a subfold to the current one>
-        if fold.level != level_to_sort or level_last > level_to_sort:
-            # merge this fold with the previous one
-            to_merge.append(fold)
-
-        else:
-            # this is toplevel fold we want to keep, so yield everything that
-            # was merged till here
-            yield make_fold(to_merge)
-
-            to_merge = [fold]
-        level_last = fold.level
-
-    # yield the last fold as well
-    yield make_fold(to_merge)
-
-
 def normal(cmd):
     "Convenience function for unremapped normal commands."
     return vim.command("normal! {}".format(cmd))
@@ -201,7 +139,7 @@ def print_foldlevel():
         Print foldlevel of fall lines in current range.
     """
     cr = vim.current.range
-    for lvl, line in it.izip(line_range_to_foldlevel(cr.start, cr.end), cr[:]):
+    for lvl, line in zip(line_range_to_foldlevel(cr.start, cr.end), cr[:]):
         print(lvl, line)
 
 
@@ -217,47 +155,6 @@ def print_folds(folds):
 
 def sort_folds(sort_line=0):
     sorted_folds = sorted(get_folds(), key=lambda f: f[sort_line])
-
-    sorted_lines = list(it.chain(*it.imap(lambda f: f.lines, sorted_folds)))
+    sorted_lines = (
+        list(itertools.chain.from_iterable(f.lines for f in sorted_folds)))
     vim.current.range[:] = sorted_lines
-
-
-def _get_folds():
-    """
-        Get folds in current range.
-
-        Uses foldlevel for every line to identify folds. Unfortunately does not
-        find directly adjacent folds in all cases.
-    """
-    cr = vim.current.range
-    foldlevels = line_range_to_foldlevel(cr.start, cr.end)
-
-    lvl_and_length = map(lambda (lvl, items): (lvl, len(list(items))),
-                         it.groupby(foldlevels))
-
-    current_start = cr.start
-    for i, (lvl, length) in enumerate(lvl_and_length):
-        #  print("Current level:", lvl)
-        try:
-            prev_level_lower = lvl_and_length[i-1][0] < lvl
-            #  print("Prev lvl", lvl_and_length[i-1][0])
-        except IndexError:
-            prev_level_lower = False
-
-        try:
-            next_level_higher = lvl_and_length[i+1][0] > lvl
-            #  print("Next lvl", lvl_and_length[i+1][0])
-        except IndexError:
-            next_level_higher = False
-
-        if next_level_higher != prev_level_lower:
-            if next_level_higher:
-                length -= 1
-            else:
-                length += 1
-
-        #  print("Resulting length", length)
-
-        if length > 0:
-            yield Fold(level=lvl, start=current_start, length=length)
-            current_start += length
