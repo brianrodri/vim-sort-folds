@@ -41,50 +41,59 @@ def sort_folds(key_line=1):
     Args:
         key_line: int. The line number used to give folds an ordering.
     """
-    old_buffer = vim.current.buffer[:]
     old_folds = list(get_folds_intersecting_current_range())
     sorted_folds = sorted(old_folds, key=operator.itemgetter(key_line - 1))
-    for old, new in reversed(list(zip(old_folds, sorted_folds))):
-        vim.current.buffer[old.start:old.end] = old_buffer[new.start:new.end]
+
+    old_buffer = list(vim.current.buffer)
+    folds_to_swap = list(zip(old_folds, sorted_folds))
+    for dst, src in reversed(folds_to_swap):
+        vim.current.buffer[dst.start:dst.end] = old_buffer[src.start:src.end]
 
 
 def get_folds_intersecting_current_range():
     """Yields all folds intersecting the currently selected range."""
-    starts, ends = (
-        itertools.tee(get_start_lines_of_folds_intersecting_current_range()))
-    next(ends, None)
-    return (Fold(start, end) for start, end in zip(starts, ends))
+    return (
+        Fold(s, e) for s, e in get_spans_of_folds_intersecting_current_range())
 
 
-def get_start_lines_of_folds_intersecting_current_range():
+def get_spans_of_folds_intersecting_current_range():
     """Yields starting line numbers of all folds intersecting the current range.
 
     Yields:
         int.
     """
-    old_cursor = vim.current.window.cursor
-    fold_head = vim.current.range.start
-    while fold_head < vim.current.range.end:
-        yield fold_head
-        next_fold_head = move_cursor('zj')
-        if fold_head < next_fold_head:
-            fold_head = next_fold_head
-        else:
-            fold_head = move_cursor(']z') + 1
-            break
-    yield fold_head
-    vim.current.window.cursor = old_cursor
+    with restore_cursor():
+        at_last_fold = False
+        next_fold_head = perform_motion(None)
+        while not at_last_fold and next_fold_head <= vim.current.range.end:
+            fold_head, next_fold_head = next_fold_head, perform_motion('zj')
+            with restore_cursor():
+                if fold_head == next_fold_head:
+                    fold_end = perform_motion(']z') + 1
+                    at_last_fold = True
+                else:
+                    fold_end = perform_motion('zk') + 1
+            yield (fold_head, fold_end)
 
 
-def move_cursor(motion):
-    """Applies a normal command then returns line number the cursor ends up at.
+def perform_motion(motion):
+    """Applies a motion, then returns the line number the cursor ends up on.
 
     Args:
-        motion: str. When empty, no motion is made.
+        motion: str or None. The vim motion to perform.
 
     Returns:
         int. The line number of the cursor after applying the motion.
     """
-    if motion:
+    if motion is not None:
         vim.command(f'normal! {motion}')
     return int(vim.eval('line(".")'))
+
+
+def restore_cursor():
+    """Context manager to restore the cursor's position after closing."""
+    old_cursor = vim.current.window.cursor
+    try:
+        yield
+    finally:
+        vim.current.window.cursor = old_cursor
