@@ -58,9 +58,9 @@ def sort_folds(line_index=0):
     for dst, src in reversed(list(zip(initial_folds, sorted_folds))):
         current_buffer[dst.start:dst.end] = initial_buffer[src.start:src.end]
 
-    # Show the sorted folds.
-    vim.command('normal! zXzC')
-    level = fold_level(perform_motion(None)) - 1
+    # Present the result.
+    vim.command('normal! zxzC')
+    level = fold_level(perform_motion(None))
     if level > 1:
         vim.command(f'normal! {level}zo')
 
