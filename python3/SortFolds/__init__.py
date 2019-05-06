@@ -5,6 +5,7 @@
 Maintainer:	Brian Rodriguez
 """
 import contextlib
+import copy
 import operator
 import vim
 
@@ -46,7 +47,7 @@ def sort_folds(line_num_key=1):
     Args:
         line_num_key: int. The line number used to give folds their ordering.
     """
-    initial_buf = vim.current.buffer[:]
+    initial_buf = copy.copy(vim.current.buffer)
     initial_folds = list(Fold(*r) for r in get_fold_ranges_in_current_range())
     sorted_folds = (
         sorted(initial_folds, key=operator.itemgetter(line_num_key - 1)))
