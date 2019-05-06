@@ -1,7 +1,7 @@
-*SortFolds.txt*	For Vim version 8.0	Last change: 2018 October 11
+*SortFolds.txt*	For Vim version 8.0	Last change: 2019-05-06
 
-Version: 0.2.0
-Author : Oliver Breitwieser <oliver.breitwieser@gmail.com>
+Version: 0.3.0
+Author : Brian Rodriguez <brian@brianrodri.com>
 License: MIT license
 
 
@@ -16,33 +16,21 @@ USAGE                                   *SortFolds* *SortFolds-usage*
 
     This little plugin solves that issue: It sorts a visually selected region
     while keeping closed folds intact. Since folds can be created in a variety
-    of ways (|fold-methods|), it is therefore straight-forward to sort
-    arbitrary groups of text based on their first line.
+    of ways (|fold-methods|), it is therefore straight-forward to sort arbitrary
+    groups of text based on their first line.
 
     One use-case is to sort functions alphabetically after the fact.
 
     NOTE: This plugin was not tested and is not expected to work with
-    `foldmethod` set to `manual` for now.
-
-==============================================================================
-MAPPINGS                                *SortFolds-mappings*
-
-    Currently there is only one binding - |<Plug>SortFolds| - that needs to be
-    bound in visual mode. The default is:
-
-                                        *<Plug>SortFolds*
->
-    vmap <Leader>sf <Plug>SortFolds
-<
-    Then visually select the region you want to sort and use the mapping.
+    `foldmethod` set to `manual` yet.
 
 ==============================================================================
 SORTING BY OTHER LINES IN FOLD          *SortFolds-custom-sort-line*
 
     Per default folds are sorted based on the contents of the first line in
     each fold. If, for some reason, you need to sort folds by the contents of
-    another line, you can do by directly calling `SortFolds#SortFolds` with
-    the given line number. Lines in folds are zero-indexed. That means to sort
+    another line, you can do by directly calling `SortFolds#SortFolds` with the
+    given line number. Lines in folds are zero-indexed. That means to sort
     based on the 42th line you would map:
 >
     vmap <silent> <Leader>sf :call SortFolds#SortFolds(41)<CR>
@@ -50,6 +38,6 @@ SORTING BY OTHER LINES IN FOLD          *SortFolds-custom-sort-line*
 ==============================================================================
 REQUIREMENTS                            *SortFolds-requirements*
 
-    SortFolds needs |+python| support enabled.
+    SortFolds needs |+python3| support enabled.
 
  vim:tw=78:ts=4:ft=help:norl:
