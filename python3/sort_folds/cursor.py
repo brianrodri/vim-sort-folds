@@ -8,10 +8,10 @@ import vim  # pylint: disable=import-error
 class CursorRestorer(contextlib.ContextDecorator):
     """Context manager to restore vim's cursor position on exit."""
     def __init__(self):
-        self._initial_cursor = vim.current.window.cursor
+        self._initial_cursor = None
 
     def __enter__(self):
-        pass
+        self._initial_cursor = vim.current.window.cursor
 
     def __exit__(self, *unused_exc_info):
         vim.current.window.cursor = self._initial_cursor
@@ -88,4 +88,4 @@ def in_selected_vim_range(line_num):
     Returns:
         bool.
     """
-    return vim.current.range.start <= line_num < vim.current.range.end
+    return vim.current.range.start <= line_num <= vim.current.range.end

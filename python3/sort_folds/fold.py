@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 # encoding: utf-8
 """Defines utility class for working with vim folds."""
+import collections
 import vim  # pylint: disable=import-error
 
 
-class VimFold():
+class VimFold(collections.abc.MutableSequence):
     """Provides a mutable sequence interface for working with vim folds.
 
     Folds behave like a list-slice taken from vim's current buffer, but they
@@ -66,7 +67,7 @@ class VimFold():
 
     def __getitem__(self, key):
         if isinstance(key, int):
-            return vim.current.buffer[key]
+            return vim.current.buffer[self.start + key]
         if isinstance(key, slice):
             return vim.current.buffer[self._shifted(key)]
         # Finally, assume key to be a sequence.
@@ -74,7 +75,7 @@ class VimFold():
 
     def __setitem__(self, key, value):
         if isinstance(key, int):
-            vim.current.buffer[key] = value
+            vim.current.buffer[self.start + key] = value
         elif isinstance(key, slice):
             vim.current.buffer[self._shifted(key)] = value
         else:
@@ -83,7 +84,7 @@ class VimFold():
 
     def __delitem__(self, key):
         if isinstance(key, int):
-            del vim.current.buffer[key]
+            del vim.current.buffer[self.start + key]
         elif isinstance(key, slice):
             del vim.current.buffer[self._shifted(key)]
         else:
