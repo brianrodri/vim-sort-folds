@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 # encoding: utf-8
-"""Provides utility classes and functions for working with vim's current cursor.
-"""
+"""Provides utility classes/functions for working with vim's current cursor."""
 import vim
 
 
@@ -23,12 +22,12 @@ def walk_over_folds():
             numbers of a fold.
     """
     cursor = move_to_first_fold()
-    at_end_of_folds = (cursor is None)
-    while not at_end_of_folds and cursor in vim.current.range:
-        start, end = (cursor, perform_motion('zo]z') + 1)
+    is_at_end_of_folds = (cursor is None)
+    while not is_at_end_of_folds and cursor in vim.current.range:
+        start, end = cursor, perform_motion('zo]z') + 1
         yield (start, end)
         cursor = perform_motion('zj')
-        at_end_of_folds = (
+        is_at_end_of_folds = (
             cursor == start or get_fold_level(cursor) != get_fold_level(start))
 
 
@@ -48,7 +47,7 @@ def move_to_first_fold():
         with CursorRestorer():
             prev_fold_start = perform_motion('zo[z')
         if get_fold_level(cursor) == get_fold_level(prev_fold_start):
-            cursor = perform_motion('zo[z')
+            cursor = prev_fold_start
     return cursor if cursor in vim.current.range else None
 
 
