@@ -18,7 +18,7 @@ def sort_folds(key_index=0):
     """
     buffer_copy = vim.current.buffer[:]
     with cursor.CursorRestorer():
-        initial_folds = [vim_fold.VimFold(*r) for r in cursor.walk_over_folds()]
+        initial_folds = [vim_fold.VimFold(*f) for f in cursor.walk_over_folds()]
     sorted_folds = sorted(initial_folds, key=lambda f: f.get(key_index).lower())
     safe_folds_to_swap = reversed(list(zip(initial_folds, sorted_folds)))
     for old_fold, new_fold in safe_folds_to_swap:
@@ -27,8 +27,9 @@ def sort_folds(key_index=0):
 
 
 def present_result():
-    """Modifies vim's fold level to display the folds that have been sorted."""
-    cursor.perform_motion('zXzC')
-    level = cursor.get_fold_level()
-    if level:
-        vim.command(f'normal! {level}zo')
+    """Modifies vim's fold level to show the sorting results."""
+    with cursor.CursorRestorer():
+        cursor.perform_motion('zXzC')
+        level = cursor.get_fold_level()
+        if level:
+            vim.command(f'normal! {level}zo')
