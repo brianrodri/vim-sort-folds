@@ -2,11 +2,9 @@
 # encoding: utf-8
 """Provides utility classes and functions for working with vim's current cursor.
 """
-import contextlib
 import vim
 
 
-@contextlib.contextmanager
 class CursorRestorer():
     """Context manager to restore vim's cursor position on exit."""
     def __init__(self):
