@@ -1,79 +1,13 @@
 #!/usr/bin/env python3
 # encoding: utf-8
 """Sort vim folds based on their first lines."""
-import collections
 import contextlib
 import vim
 
+from . import vim_fold
+
 __all__ = ['sort_folds']
 __version__ = '0.3.0'
-
-
-class Fold(collections.abc.MutableSequence):
-    """An interface for working with the foldable lines in vim's current buffer.
-
-    Folds behave like sequences when subscripted using another sequence:
-        >>> fold = Fold(start_line_num=1, end_line_num=3)
-        >>> sequence = ['line 1', 'line 2', 'line 3']
-        >>> fold[sequence]
-        ['line 1', 'line 2']
-        >>> fold[sequence] = ['line A', 'line B', 'line C']
-        >>> sequence
-        ['line A', 'line B', 'line C', 'line 3']
-        >>> del fold[sequence]
-        >>> sequence
-        ['line C', 'line 2', 'line 3']
-
-    Attributes:
-        start: int. The buffer index at which the fold starts (inclusive).
-        end: int. The buffer index at which the fold ends (exclusive).
-    """
-    def __init__(self, start_line_num, end_line_num):
-        """Initializes a new Fold from the given pair of line numbers.
-
-        Args:
-            start_line_num: int. Line number at which self starts (inclusive).
-            end_line_num: int. Line number at which self ends (exclusive).
-        """
-        self.start = start_line_num - 1
-        self.end = end_line_num - 1
-
-    def get(self, index):
-        """Gets line from vim's current buffer at the given index.
-
-        Args:
-            index: int.
-
-        Returns:
-            str. The corresponding str from vim's current buffer offset by the
-                fold's position.
-        """
-        return vim.current.buffer[self.start + i]
-
-    def insert(self, buf, item):
-        """Inserts an item before the fold's position in the given buf.
-
-        Args:
-            buf: collections.abc.MutableSequence.
-            item: str.
-        """
-        buf.insert(self.start, item)
-
-    def __iter__(self):
-        """Iterates through self's fold in vim's current buffer."""
-        return (self.get(i) for i in range(self.start, self.end))
-
-    def __len__(self):
-        return self.end - self.start
-
-    def __getitem__(self, buf):
-        return buf[self.start:self.end]
-
-    def __setitem__(self, buf, iterable):
-        buf[self.start:self.end] = iterable
-
-    def __delitem__(self, buf):
-        del buf[self.start:self.end]
 
 
 def sort_folds(key_index=0):
@@ -84,7 +18,7 @@ def sort_folds(key_index=0):
     """
     buffer_copy = vim.current.buffer[:]
     with cursor_restorer():
-        initial_folds = [Fold(*r) for r in walk_over_folds()]
+        initial_folds = [vim_fold.VimFold(*r) for r in walk_over_fold_spans()]
     sorted_folds = sorted(initial_folds, key=lambda f: f.get(key_index).lower())
     safe_folds_to_swap = reversed(list(zip(initial_folds, sorted_folds)))
     for old_fold, new_fold in safe_folds_to_swap:
@@ -102,7 +36,7 @@ def cursor_restorer():
         vim.current.window.cursor = initial_cursor
 
 
-def walk_over_folds():
+def walk_over_fold_spans():
     """Yields ranges of foldable line numbers while moving vim's cursor.
 
     Yields:
