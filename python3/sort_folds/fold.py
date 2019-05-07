@@ -1,11 +1,10 @@
 #!/usr/bin/env python3
 # encoding: utf-8
 """Defines utility class for working with vim folds."""
-import collections
 import vim  # pylint: disable=import-error
 
 
-class VimFold(collections.abc.MutableSequence):
+class VimFold():
     """Provides a mutable sequence interface for working with vim folds.
 
     Folds behave like a list-slice taken from vim's current buffer, but they
