@@ -23,7 +23,7 @@ def walk_over_folds():
     """
     cursor = move_to_first_fold()
     is_cursor_at_end_of_folds = (cursor is None)
-    while not is_cursor_at_end_of_folds and cursor in vim.current.range:
+    while not is_cursor_at_end_of_folds and in_vim_current_range(cursor):
         start, end = cursor, perform_motion('zo]z') + 1
         yield (start, end)
         cursor = perform_motion('zj')
@@ -48,7 +48,7 @@ def move_to_first_fold():
             prev_fold_start = perform_motion('zo[z')
         if get_fold_level(cursor) == get_fold_level(prev_fold_start):
             cursor = prev_fold_start
-    return cursor if cursor in vim.current.range else None
+    return cursor if in_vim_current_range(cursor) else None
 
 
 def perform_motion(motion):
@@ -76,3 +76,15 @@ def get_fold_level(line_num):
         int. The fold level for the given line number.
     """
     return int(vim.eval(f'foldlevel({line_num})'))
+
+
+def in_vim_current_range(line_num):
+    """Returns whether given line number is within vim's current range.
+
+    Args:
+        line_num: int.
+
+    Returns:
+        bool.
+    """
+    return vim.current.range.start <= line_num < vim.current.range.end
