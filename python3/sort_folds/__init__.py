@@ -19,6 +19,8 @@ def sort_folds(key_index=0):
     buffer_copy = vim.current.buffer[:]
     with cursor.CursorRestorer():
         initial_folds = [vim_fold.VimFold(*f) for f in cursor.walk_over_folds()]
+    if len(initial_folds) < 2:
+        return
     sorted_folds = sorted(initial_folds, key=lambda f: f.get(key_index).lower())
     safe_folds_to_swap = reversed(list(zip(initial_folds, sorted_folds)))
     for old_fold, new_fold in safe_folds_to_swap:
