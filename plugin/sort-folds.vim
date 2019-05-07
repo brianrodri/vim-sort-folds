@@ -11,6 +11,4 @@ if !has('python3')
   finish
 endif
 
-command! SortFolds call sortfolds#SortFolds()<CR>
-
 let &cpo = s:save_cpo
