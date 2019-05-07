@@ -57,10 +57,6 @@ class VimFold(abc.MutableSequence):  # pylint: disable=too-many-ancestors
         """Returns the number of lines which self spans."""
         return self._stop - self._start
 
-    def __iter__(self):
-        """Iterates through the lines of self's fold in vim's current buffer."""
-        yield from (self.get(i) for i in range(self._start, self._stop))
-
     def _shift_slice(self, s):
         """Returns a copy of the given slice shifted by self's position."""
         return slice(self._start + s.start, self._start + s.stop, s.step)
