@@ -4,26 +4,25 @@
 
 ![](https://raw.github.com/obreitwi/vim-sort-folds/master/doc/demo.gif)
 
-Sorting folds is not easily possible in vanilla vim. You could join all lines in a fold, sort, then
-split them up again; but that is time consuming and tedious.
+Sorting folds is tedious in vanilla vim. You would need to join all lines of a fold, sort the joined
+lines, then split them back up. Much more involved than most other things vim allows you to do,
+especially with motions.
 
-This little plugin solves that issue: it sorts a visually selected region while keeping closed folds
-intact. Since folds can be created in a variety of ways, it is therefore straight-forward to sort
-arbitrary groups of text based on their first line.
+This plugin aims to solves that issue: it provides a command to sort the folds of a visually
+selected region, while keeping them in tact. Since folds can be created in a variety of ways, it is
+especially handy for sorting arbitrary groups of text based on their first line.
 
-One use-case (demonstrated above and the original motivation for this plugin) is to sort functions
-alphabetically after the fact.
+One use-case (demonstrated above, and the motivation of the original author of this plugin) is to
+sort functions alphabetically after the fact.
 
 
 ## Installation
 
-`vim-sort-folds` is compatible to the most commonly used plugin managers for vim. Just drop the
-following line in your `.vimrc`:
+`vim-sort-folds` is compatible with most of the commonly used plugin managers for vim. Just drop
+something like the following lines somewhere in your `.vimrc`:
 
-`Plug 'brianrodri/vim-sort-folds'` (for [vim-plug](https://github.com/junegunn/vim-plug))
-
-`Plugin 'brianrodri/vim-sort-folds'`
-(for [Vundle](https://github.com/VundleVim/Vundle.vim))
+ - `Plug 'brianrodri/vim-sort-folds'` (for [vim-plug](https://github.com/junegunn/vim-plug))
+ - `Plugin 'brianrodri/vim-sort-folds'` (for [Vundle](https://github.com/VundleVim/Vundle.vim))
 
 
 ## Note: manual foldmethod

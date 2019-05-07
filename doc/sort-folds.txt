@@ -1,14 +1,14 @@
-*sort-folds.txt*	For Vim version 8.0	Last change: 2019-05-06
+*vim-sort-folds*	Last change: 2019-05-06
 
 Version: 0.3.0
 Author : Brian Rodriguez <brian@brianrodri.com>
 License: MIT license
 
 
-                sort-folds - sort folds by their first line
+               vim-sort-folds - sort folds by their first line
 
 ==============================================================================
-USAGE                                   *sort-folds* *sort-folds-usage*
+USAGE                                   *vim-sort-folds* *vim-sort-folds-usage*
 
     Sorting |folds| is not easily possible in vanilla vim. You could join all
     lines in a fold, sort and split them up again; however, it is time
@@ -25,19 +25,19 @@ USAGE                                   *sort-folds* *sort-folds-usage*
     `foldmethod` set to `manual` yet.
 
 ==============================================================================
-SORTING BY OTHER LINES IN FOLD          *sort-folds-custom-sort-line*
+SORTING BY OTHER LINES IN FOLD          *vim-sort-folds-custom-sort-line*
 
     Per default folds are sorted based on the contents of the first line in
     each fold. If, for some reason, you need to sort folds by the contents of
-    another line, you can do by directly calling `sort-folds#SortFolds` with the
+    another line, you can do by directly calling `sortfolds#SortFolds` with the
     given line number. Lines in folds are zero-indexed. That means to sort
     based on the 42th line you would map:
 >
-    vmap <silent> <Leader>sf :call sort-folds#SortFolds(41)<CR>
+    vmap <silent> <Leader>sf :call sortfolds#SortFolds(41)<CR>
 
 ==============================================================================
-REQUIREMENTS                            *sort-folds-requirements*
+REQUIREMENTS                            *vim-sort-folds-requirements*
 
-    sort-folds needs |+python3| support enabled.
+    vim-sort-folds needs |+python3| support enabled.
 
  vim:tw=78:ts=4:ft=help:norl:

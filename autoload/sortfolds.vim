@@ -1,4 +1,4 @@
-" sort-folds.vim - Sort closed folds based on first line.
+" vim-sort-folds - Sort folds based on their first line.
 " Maintainer:   Brian Rodriguez
 " Version:      0.3.0
 " License:      MIT license
