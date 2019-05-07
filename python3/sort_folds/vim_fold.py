@@ -20,7 +20,7 @@ class VimFold(collections.abc.MutableSequence):
         >>> sequence
         ['line C', 'line 2', 'line 3']
 
-    The rest of VimFold's interface acts directly upon vim's current buffer.
+    The rest of VimFold's interface act directly upon vim's current buffer.
 
     Attributes:
         start: int. The buffer index at which the fold starts (inclusive).
@@ -49,7 +49,7 @@ class VimFold(collections.abc.MutableSequence):
         return vim.current.buffer[self.start + index]
 
     def insert(self, index, line):
-        """Insert item to vim's current buffer at index, offset by self's start.
+        """Insert line to vim's current buffer at index, offset by self's start.
 
         Args:
             index: int.
@@ -62,7 +62,7 @@ class VimFold(collections.abc.MutableSequence):
         return (self.get(i) for i in range(self.start, self.end))
 
     def __len__(self):
-        """Returns the number of lines which self spans."""
+        """Returns the number of lines that self spans."""
         return self.end - self.start
 
     def __getitem__(self, sequence):
