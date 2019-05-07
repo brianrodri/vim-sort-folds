@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # encoding: utf-8
-"""Sort vim folds based on their first lines."""
+"""Sort vim folds based on their first line."""
 import vim
 
 from sort_folds import cursor
@@ -20,8 +20,7 @@ def sort_folds(line_index_key=0):
     if len(folds) > 1:
         initial_buffer = vim.current.buffer[:]
         sorted_folds = sorted(folds, key=make_fold_key(line_index_key))
-        safe_folds_to_swap = reversed(list(zip(folds, sorted_folds)))
-        for old_fold, new_fold in safe_folds_to_swap:
+        for old_fold, new_fold in reversed(list(zip(folds, sorted_folds))):
             old_fold[vim.current.buffer] = new_fold[initial_buffer]
         present_result()
 

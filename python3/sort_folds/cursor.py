@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # encoding: utf-8
-"""Provides utility classes/functions for working with vim's cursor."""
+"""Utility classes/functions for working with vim's cursor."""
 import contextlib
 import vim
 
@@ -24,11 +24,11 @@ def walk_folds():
     """
     cursor = move_to_first_fold()
     while cursor is not None and in_selected_vim_range(cursor):
-        fstart, fend, cursor = (
+        fold_start, fold_end, cursor = (
             cursor, perform_motion('zo]z') + 1, perform_motion('zj'))
-        if cursor == fstart or fold_level(cursor) != fold_level(fstart):
+        if cursor == fold_start or fold_level(cursor) != fold_level(fold_start):
             cursor = None
-        yield (fstart, fend)
+        yield (fold_start, fold_end)
 
 
 def move_to_first_fold():
