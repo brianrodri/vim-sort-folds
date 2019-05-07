@@ -11,7 +11,7 @@ class CursorRestorer():
         self.initial_cursor = vim.current.window.cursor
     def __enter__(self):
         pass
-    def __exit__(self):
+    def __exit__(self, *exc_info):
         vim.current.window.cursor = self.initial_cursor
 
 
