@@ -27,7 +27,6 @@ def sort_folds(key_index=0):
     for old_fold, new_fold in safe_folds_to_swap:
         old_fold[vim.current.buffer] = new_fold[initial_buffer]
     present_result()
-    vim.command(f'normal! echom "{len(initial_folds)} folds sorted"')
 
 
 def present_result():
