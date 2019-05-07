@@ -19,22 +19,10 @@ def sort_folds(line_index_key=0):
         folds = [fold.VimFold(start, end) for start, end in cursor.walk_folds()]
     if len(folds) > 1:
         initial_buffer = vim.current.buffer[:]
-        sorted_folds = sorted(folds, key=make_fold_key(line_index_key))
+        sorted_folds = sorted(folds, key=lambda f: f[line_index_key].lower())
         for old_fold, new_fold in reversed(list(zip(folds, sorted_folds))):
             old_fold[vim.current.buffer] = new_fold[initial_buffer]
         present_result()
-
-
-def make_fold_key(line_index_key):
-    """Returns a key function used to sort VimFolds.
-
-    Args:
-        line_index_key: int. Index of line to use as the folds' comparison key.
-
-    Returns:
-        callable(VimFold) -> Comparable.
-    """
-    return lambda fold: fold.get(line_index_key).lower()
 
 
 def present_result():
