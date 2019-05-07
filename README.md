@@ -2,12 +2,10 @@
 
 ## Overview
 
-![](https://raw.github.com/obreitwi/vim-sort-folds/master/doc/demo.gif)  
-_(Demo w/ [SimpylFold](https://github.com/tmhedberg/SimpylFold),
-colorscheme [xoria256](https://github.com/vim-scripts/xoria256.vim))_
+![](https://raw.github.com/obreitwi/vim-sort-folds/master/doc/demo.gif)
 
 Sorting folds is not easily possible in vanilla vim. You could join all lines
-in a fold, sort and split them up again; however, it is time consuming and
+in a fold, sort and split them up again; however, that is time consuming and
 tedious.
 
 This little plugin solves that issue: It sorts a visually selected region while
@@ -18,27 +16,19 @@ their first line.
 One use-case (demonstrated above and the original motivation for this plugin)
 is to sort functions alphabetically after the fact.
 
-Furthermore, it is possible to sort based on a other lines than then first.
-
 
 ## Installation
 
-`SortFolds` is compatible to the most commonly used plugin managers for vim.
+`vim-sort-folds` is compatible to the most commonly used plugin managers for vim.
 Just drop the following line in your `.vimrc`:
 
-`Plugin 'obreitwi/vim-sort-folds'`
-(for [Vundle](https://github.com/VundleVim/Vundle.vim))
-
-`Plug 'obreitwi/vim-sort-folds'`
+`Plug 'brianrodri/vim-sort-folds'`
 (for [vim-plug](https://github.com/junegunn/vim-plug))
 
-
-## Mappings
-
-Per default, sorting visually selected folds is mapped to `<leader>sf`, if
-available, but can be easily remapped.
+`Plugin 'brianrodri/vim-sort-folds'`
+(for [Vundle](https://github.com/VundleVim/Vundle.vim))
 
 
 ## Note: manual foldmethod
-This plugin was not tested and is not expected to work with `foldmethod` set to
-`manual` for now.
+This plugin is untested, and is not expected to work when `foldmethod` is set to
+`manual` (for now).
