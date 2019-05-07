@@ -67,7 +67,7 @@ class VimFold(collections.abc.MutableSequence):
 
     def __getitem__(self, key):
         if isinstance(key, int):
-            return vim.current.buffer[self.start + key]
+            return vim.current.buffer[self._start + key]
         if isinstance(key, slice):
             return vim.current.buffer[self._shifted(key)]
         # Finally, assume key to be a sequence.
@@ -75,7 +75,7 @@ class VimFold(collections.abc.MutableSequence):
 
     def __setitem__(self, key, value):
         if isinstance(key, int):
-            vim.current.buffer[self.start + key] = value
+            vim.current.buffer[self._start + key] = value
         elif isinstance(key, slice):
             vim.current.buffer[self._shifted(key)] = value
         else:
@@ -84,7 +84,7 @@ class VimFold(collections.abc.MutableSequence):
 
     def __delitem__(self, key):
         if isinstance(key, int):
-            del vim.current.buffer[self.start + key]
+            del vim.current.buffer[self._start + key]
         elif isinstance(key, slice):
             del vim.current.buffer[self._shifted(key)]
         else:
