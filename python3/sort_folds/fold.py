@@ -1,14 +1,26 @@
 #!/usr/bin/env python3
 # encoding: utf-8
-"""Defines VimFold class to help working with folds in vim."""
-import collections
-import vim
+"""Defines utility class for working with vim folds."""
+from collections import abc
+import vim  # pylint: disable=import-error
 
 
-class VimFold(collections.abc.MutableSequence):
-    """Provides an interface for working with vim folds.
+class VimFold(abc.MutableSequence):  # pylint: disable=too-many-ancestors
+    """Provides a mutable sequence interface for working with vim folds.
 
-    Folds behave like slices when subscripted with a sequence:
+    Folds behave like a list-slice taken from vim's current buffer. Actions
+    performed on them will act directly on the buffer. For example:
+
+        >>> fold = VimFold(start_line_num=2, end_line_num=5)
+        >>> fold.insert(0, 'asdf')
+        # 'asdf' is now the second line in vim's current buffer. All subsequent
+        # elements have been pushed by one.
+        >>> fold[0]
+        'asdf'
+
+    Folds can also be indexed with a sequence. This allows the fold to behave
+    like a list-slice of *that* sequence instead. For example:
+
         >>> fold = VimFold(start_line_num=1, end_line_num=3)
         >>> sequence = ['line 1', 'line 2', 'line 3']
         >>> fold[sequence]
@@ -20,7 +32,7 @@ class VimFold(collections.abc.MutableSequence):
         >>> sequence
         ['line C', 'line 2', 'line 3']
 
-    The rest of VimFold's interface acts like a sublist in vim's current buffer.
+    Otherwise, folds behave like a slice of vim's current buffer.
     """
     def __init__(self, start_line_num, end_line_num):
         """Initializes a new VimFold from the given pair of line numbers.
@@ -30,42 +42,52 @@ class VimFold(collections.abc.MutableSequence):
             end_line_num: int. Line number at which self ends (exclusive).
         """
         self._start = start_line_num - 1
-        self._end = end_line_num - 1
+        self._stop = end_line_num - 1
 
-    def get(self, index):
-        """Get line from vim's current buffer at index, offset by self's start.
-
-        Args:
-            index: int.
-
-        Returns:
-            str. The corresponding line in vim's current buffer, offset by
-                self's position.
-        """
-        return vim.current.buffer[self._start + index]
-
-    def insert(self, index, line):
-        """Insert line to vim's current buffer at index, offset by self's start.
+    def insert(self, index, value):
+        """Insert value in vim's current buffer at index, starting at the fold.
 
         Args:
             index: int.
-            line: str.
+            value: str.
         """
-        vim.current.buffer.insert(self._start + pos, item)
+        vim.current.buffer.insert(self._start + index, value)
 
     def __len__(self):
         """Returns the number of lines which self spans."""
-        return self._end - self._start
+        return self._stop - self._start
 
     def __iter__(self):
         """Iterates through the lines of self's fold in vim's current buffer."""
-        return (self._get(i) for i in range(self._start, self._end))
+        yield from (self.get(i) for i in range(self._start, self._stop))
 
-    def __getitem__(self, sequence):
-        return sequence[self._start:self._end]
+    def _shift_slice(self, s):
+        """Returns a copy of the given slice shifted by self's position."""
+        return slice(self._start + s.start, self._start + s.stop, s.step)
 
-    def __setitem__(self, mutable_sequence, item):
-        mutable_sequence[self._start:self._end] = item
+    def __getitem__(self, key):
+        if isinstance(key, int):
+            return vim.current.buffer[key]
+        elif isinstance(key, slice):
+            return vim.current.buffer[self._shift_slice(key)]
+        elif isinstance(key, abc.Sequence):
+            return key[self._start:self._stop]
+        raise TypeError
 
-    def __delitem__(self, mutable_sequence):
-        del mutable_sequence[self._start:self._end]
+    def __setitem__(self, key, value):
+        if isinstance(key, int):
+            vim.current.buffer[key] = value
+        elif isinstance(key, slice):
+            vim.current.buffer[self._shift_slice(key)] = value
+        elif isinstance(self, abc.MutableSequence):
+            key[self._start:self._stop] = value
+        raise TypeError
+
+    def __delitem__(self, key):
+        if isinstance(key, int):
+            del vim.current.buffer[key]
+        elif isinstance(key, slice):
+            del vim.current.buffer[self._shift_slice(key)]
+        elif isinstance(self, abc.MutableSequence):
+            del key[self._start:self._stop]
+        raise TypeError

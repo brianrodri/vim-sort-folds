@@ -3,7 +3,7 @@
 """Sort vim folds based on their first line."""
 from sort_folds import cursor
 from sort_folds import fold
-import vim
+import vim  # pylint: disable=import-error
 
 __all__ = ['sort_folds']
 __version__ = '0.3.0'
@@ -34,7 +34,7 @@ def make_fold_key(line_index_key):
     Returns:
         callable(VimFold) -> Comparable.
     """
-    return (lambda fold: fold.get(line_index_key).lower())
+    return lambda fold: fold.get(line_index_key).lower()
 
 
 def present_result():

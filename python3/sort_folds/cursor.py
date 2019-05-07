@@ -1,14 +1,17 @@
 #!/usr/bin/env python3
 # encoding: utf-8
-"""Utility classes/functions for working with vim's cursor."""
+"""Utility classes and functions for working with vim's cursor."""
 import contextlib
-import vim
+import vim  # pylint: disable=import-error
 
 
 class CursorRestorer(contextlib.ContextDecorator):
     """Context manager to restore vim's cursor position on exit."""
-    def __enter__(self):
+    def __init__(self):
         self._initial_cursor = vim.current.window.cursor
+
+    def __enter__(self):
+        pass
 
     def __exit__(self, *unused_exc_info):
         vim.current.window.cursor = self._initial_cursor
@@ -41,8 +44,7 @@ def move_to_first_fold():
         next_fold_start = perform_motion('zj')
         if cursor == next_fold_start:
             return None
-        else:
-            cursor = next_fold_start
+        cursor = next_fold_start
     else:
         with CursorRestorer():
             prev_fold_start = perform_motion('zo[z')
