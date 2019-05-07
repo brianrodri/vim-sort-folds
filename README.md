@@ -1,9 +1,9 @@
-# SortFolds
+# vim-sort-folds
 
 ## Overview
 
 ![](https://raw.github.com/obreitwi/vim-sort-folds/master/doc/demo.gif)  
-_(Demo \w [SimpylFold](https://github.com/tmhedberg/SimpylFold),
+_(Demo w/ [SimpylFold](https://github.com/tmhedberg/SimpylFold),
 colorscheme [xoria256](https://github.com/vim-scripts/xoria256.vim))_
 
 Sorting folds is not easily possible in vanilla vim. You could join all lines
