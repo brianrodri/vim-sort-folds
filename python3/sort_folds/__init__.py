@@ -32,6 +32,6 @@ def sort_folds(key_index=0):
 def present_result():
     """Modifies vim's fold level to show the sorting results."""
     with cursor.CursorRestorer():
-        level = cursor.get_fold_level(cursor.perform_motion('zXzC'))
+        level = cursor.get_fold_level(cursor.perform_motion('zXzC')) - 1
         if level:
             vim.command(f'normal! {level}zo')
