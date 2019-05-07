@@ -16,7 +16,8 @@ def sort_folds(line_index_key=0):
     Args:
         line_index_key: int. Index of line to use as a fold's comparison key.
     """
-    folds = [fold.VimFold(fstart, fend) for fstart, fend in cursor.walk_folds()]
+    with cursor.CursorRestorer():
+        folds = [fold.VimFold(start, end) for start, end in cursor.walk_folds()]
     if len(folds) > 1:
         initial_buffer = vim.current.buffer[:]
         sorted_folds = sorted(folds, key=make_fold_key(line_index_key))
@@ -37,7 +38,6 @@ def make_fold_key(line_index_key):
     return (lambda fold: fold.get(line_index_key).lower())
 
 
-@cursor.CursorRestorer()
 def present_result():
     """Modifies vim's fold level to show the sorting results."""
     level = cursor.fold_level(cursor.perform_motion('zXzC')) - 1

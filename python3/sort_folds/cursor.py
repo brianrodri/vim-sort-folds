@@ -14,7 +14,6 @@ class CursorRestorer(contextlib.ContextDecorator):
         vim.current.window.cursor = self._initial_cursor
 
 
-@CursorRestorer()
 def walk_folds():
     """Yields ranges of foldable line numbers discovered by vim's cursor.
 
