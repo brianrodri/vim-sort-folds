@@ -64,9 +64,9 @@ class VimFold(abc.MutableSequence):  # pylint: disable=too-many-ancestors
     def __getitem__(self, key):
         if isinstance(key, int):
             return vim.current.buffer[key]
-        elif isinstance(key, slice):
+        if isinstance(key, slice):
             return vim.current.buffer[self._shift_slice(key)]
-        elif isinstance(key, abc.Sequence):
+        if isinstance(key, abc.Sequence):
             return key[self._start:self._stop]
         raise TypeError
 
