@@ -75,7 +75,7 @@ class VimFold(abc.MutableSequence):  # pylint: disable=too-many-ancestors
             vim.current.buffer[key] = value
         elif isinstance(key, slice):
             vim.current.buffer[self._shift_slice(key)] = value
-        elif isinstance(self, abc.MutableSequence):
+        elif isinstance(key, abc.MutableSequence):
             key[self._start:self._stop] = value
         raise TypeError
 
@@ -84,6 +84,6 @@ class VimFold(abc.MutableSequence):  # pylint: disable=too-many-ancestors
             del vim.current.buffer[key]
         elif isinstance(key, slice):
             del vim.current.buffer[self._shift_slice(key)]
-        elif isinstance(self, abc.MutableSequence):
+        elif isinstance(key, abc.MutableSequence):
             del key[self._start:self._stop]
         raise TypeError
