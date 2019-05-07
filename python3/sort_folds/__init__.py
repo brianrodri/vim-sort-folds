@@ -4,7 +4,7 @@
 import vim
 
 from sort_folds import cursor
-from sort_folds import vim_fold
+from sort_folds import fold
 
 __all__ = ['sort_folds']
 __version__ = '0.3.0'
@@ -16,22 +16,21 @@ def sort_folds(key_index=0):
     Args:
         key_index: int. Which line index to use as the folds' comparison key.
     """
-    buffer_copy = vim.current.buffer[:]
+    initial_buffer = vim.current.buffer[:]
     with cursor.CursorRestorer():
-        initial_folds = [vim_fold.VimFold(*f) for f in cursor.walk_over_folds()]
+        initial_folds = [fold.VimFold(*rng) for rng in cursor.walk_over_folds()]
     if len(initial_folds) < 2:
         return
     sorted_folds = sorted(initial_folds, key=lambda f: f.get(key_index).lower())
     safe_folds_to_swap = reversed(list(zip(initial_folds, sorted_folds)))
     for old_fold, new_fold in safe_folds_to_swap:
-        old_fold[vim.current.buffer] = new_fold[buffer_copy]
+        old_fold[vim.current.buffer] = new_fold[initial_buffer]
     present_result()
 
 
 def present_result():
     """Modifies vim's fold level to show the sorting results."""
     with cursor.CursorRestorer():
-        cursor.perform_motion('zXzC')
-        level = cursor.get_fold_level()
+        level = cursor.get_fold_level(cursor.perform_motion('zXzC'))
         if level:
             vim.command(f'normal! {level}zo')

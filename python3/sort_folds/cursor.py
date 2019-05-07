@@ -7,27 +7,27 @@ import vim
 class CursorRestorer():
     """Context manager to restore vim's cursor position on exit."""
     def __init__(self):
-        self.initial_cursor = vim.current.window.cursor
+        self._initial_cursor = vim.current.window.cursor
     def __enter__(self):
-        pass
+        return self._initial_cursor
     def __exit__(self, *exc_info):
-        vim.current.window.cursor = self.initial_cursor
+        vim.current.window.cursor = self._initial_cursor
 
 
 def walk_over_folds():
-    """Yields ranges of foldable line numbers while moving vim's cursor.
+    """Yields ranges of foldable line numbers discovered by vim's cursor.
 
     Yields:
         tuple(int, int). The starting (inclusive) and ending (exclusive) line
             numbers of a fold.
     """
     cursor = move_to_first_fold()
-    is_at_end_of_folds = (cursor is None)
-    while not is_at_end_of_folds and cursor in vim.current.range:
+    is_cursor_at_end_of_folds = (cursor is None)
+    while not is_cursor_at_end_of_folds and cursor in vim.current.range:
         start, end = cursor, perform_motion('zo]z') + 1
         yield (start, end)
         cursor = perform_motion('zj')
-        is_at_end_of_folds = (
+        is_cursor_at_end_of_folds = (
             cursor == start or get_fold_level(cursor) != get_fold_level(start))
 
 
@@ -65,7 +65,7 @@ def perform_motion(motion):
     return int(vim.eval('line(".")'))
 
 
-def get_fold_level(line_num=None):
+def get_fold_level(line_num):
     """Returns the fold level for the given line number.
 
     Args:
@@ -75,6 +75,4 @@ def get_fold_level(line_num=None):
     Returns:
         int. The fold level for the given line number.
     """
-    if line_num is None:
-        line_num = perform_motion(None)
     return int(vim.eval(f'foldlevel({line_num})'))
