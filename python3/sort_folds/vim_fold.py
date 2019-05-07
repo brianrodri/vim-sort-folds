@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # encoding: utf-8
+"""Provides the helper class VimFold for working with folds in vim."""
 import collections
 import vim
 
