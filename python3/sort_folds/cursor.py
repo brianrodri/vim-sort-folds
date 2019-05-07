@@ -15,7 +15,7 @@ class CursorRestorer():
         vim.current.window.cursor = self.initial_cursor
 
 
-def walk_over_fold_spans():
+def walk_over_folds():
     """Yields ranges of foldable line numbers while moving vim's cursor.
 
     Yields:
