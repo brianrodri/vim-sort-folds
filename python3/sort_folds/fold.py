@@ -11,27 +11,26 @@ class VimFold():
     only hold indices into it. Actions performed on them will act directly on
     the buffer. For example:
 
-        >>> fold = VimFold(start_line_num=2, stop_line_num=5)
-        >>> fold.insert(0, 'asdf')
-        # 'asdf' is now the second line in vim's current buffer. All subsequent
-        # lines have been pushed by one.
-        >>> fold[1]
-        'asdf'
+    >>> fold = VimFold(start_line_num=2, stop_line_num=5)
+    >>> fold.insert(0, 'asdf')
+    # 'asdf' is now the second line in vim's current buffer. All subsequent
+    # lines have been pushed by one.
+    >>> fold[1]
+    'asdf'
 
     Folds can also be indexed with a sequence. This allows the fold to behave
     like a list-slice of *that* sequence instead. For example:
 
-        >>> fold = VimFold(start_line_num=1, stop_line_num=3)
-        >>> sequence = ['line 1', 'line 2', 'line 3']
-        >>> fold[sequence]
-        ['line 1', 'line 2']
-        >>> fold[sequence] = ['line A', 'line B', 'line C']
-        >>> sequence
-        ['line A', 'line B', 'line C', 'line 3']
-        >>> del fold[sequence]
-        >>> sequence
-        ['line C', 'line 2', 'line 3']
-
+    >>> fold = VimFold(start_line_num=1, stop_line_num=3)
+    >>> sequence = ['line 1', 'line 2', 'line 3']
+    >>> fold[sequence]
+    ['line 1', 'line 2']
+    >>> fold[sequence] = ['line A', 'line B', 'line C']
+    >>> sequence
+    ['line A', 'line B', 'line C', 'line 3']
+    >>> del fold[sequence]
+    >>> sequence
+    ['line C', 'line 2', 'line 3']
     """
     def __init__(self, start_line_num, stop_line_num):
         """Initializes a new VimFold from the given pair of line numbers.
