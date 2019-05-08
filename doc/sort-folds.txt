@@ -1,43 +1,39 @@
-*vim-sort-folds*	Last change: 2019-05-06
-
-Version: 0.3.0
-Author : Brian Rodriguez <brian@brianrodri.com>
-License: MIT license
-
-
-               vim-sort-folds - sort folds by their first line
+*vim-sort-folds*  SortFolds: sort folds by their first line
 
 ==============================================================================
-USAGE                                   *vim-sort-folds* *vim-sort-folds-usage*
+                                                             *sortfolds-usage*
+Usage ~
 
-    Sorting |folds| is not easily possible in vanilla vim. You could join all
-    lines in a fold, sort and split them up again; however, it is time
-    consuming and tedious.
+Sorting |folds| is not easily possible in vanilla vim. You could join all
+lines in a fold, sort and split them up again; however, it is time consuming
+and tedious.
 
-    This little plugin solves that issue: It sorts a visually selected region
-    while keeping closed folds intact. Since folds can be created in a variety
-    of ways (|fold-methods|), it is therefore straight-forward to sort arbitrary
-    groups of text based on their first line.
+This little plugin solves that issue: It sorts a visually selected region
+while keeping closed folds intact. Since folds can be created in a variety of
+ways (|fold-methods|), it is therefore straight-forward to sort arbitrary
+groups of text based on their first line.
 
-    One use-case is to sort functions alphabetically after the fact.
+One use-case is to sort functions alphabetically after the fact.
 
-    NOTE: This plugin was not tested and is not expected to work with
-    `foldmethod` set to `manual` yet.
+NOTE: This plugin was not tested and is not expected to work with `foldmethod`
+set to `manual` yet.
 
 ==============================================================================
-SORTING BY OTHER LINES IN FOLD          *vim-sort-folds-custom-sort-line*
+                                                  *sortfolds-custom-sort-line*
+Sorting by other lines ~
 
-    Per default folds are sorted based on the contents of the first line in
-    each fold. If, for some reason, you need to sort folds by the contents of
-    another line, you can do by directly calling `sortfolds#SortFolds` with the
-    given line number. Lines in folds are zero-indexed. That means to sort
-    based on the 42th line you would map:
+Per default folds are sorted based on the contents of the first line in each
+fold. If, for some reason, you need to sort folds by the contents of another
+line, you can do by directly calling `sortfolds#SortFolds` with the given line
+number. Lines in folds are zero-indexed. That means to sort based on the 42th
+line you would map:
 >
-    vmap <silent> <Leader>sf :call sortfolds#SortFolds(41)<CR>
-
+  vmap <silent> <Leader>sf :call sortfolds#SortFolds(41)<CR>
+<
 ==============================================================================
-REQUIREMENTS                            *vim-sort-folds-requirements*
+                                                      *sortfolds-requirements*
+Requirements ~
 
-    vim-sort-folds needs |+python3| support enabled.
+This plugin requires |+python3| support enabled.
 
- vim:tw=78:ts=4:ft=help:norl:
+vim: tw=78:ts=4:ft=help:norl:
