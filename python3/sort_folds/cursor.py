@@ -6,6 +6,7 @@ import vim  # pylint: disable=import-error
 
 class CursorRestorer(contextlib.ContextDecorator):
     """Context manager which restores vim's cursor position at exit."""
+
     def __init__(self):
         self._initial_cursor = None
 

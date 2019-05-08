@@ -45,7 +45,7 @@ class VimFold():
         self._stop = stop_line_num - 1
 
     def insert(self, index, value):
-        """Insert value into vim's current buffer, offset by self and the index.
+        """Inserts value into vim's current buffer at the index offset by self.
 
         Args:
             index: int.
@@ -54,7 +54,14 @@ class VimFold():
         vim.current.buffer.insert(self._start + index, value)
 
     def _shifted(self, aslice):
-        """Returns a copy of the given slice, but shifted by self's position."""
+        """Returns a copy of the given slice, but shifted by self's position.
+
+        Args:
+            aslice: slice.
+
+        Returns:
+            slice.
+        """
         shift = self._start
         return slice(aslice.start + shift, aslice.stop + shift, aslice.step)
 

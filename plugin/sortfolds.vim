@@ -10,11 +10,10 @@ function! s:RestoreCpo()
   unlet s:save_cpo
 endfunction
 
-if !exists('g:loaded_sortfolds')
+if exists('g:loaded_sortfolds')
   call s:RestoreCpo()
   finish
 endif
-
 let g:loaded_sortfolds = 1
 
 if !has('python3')

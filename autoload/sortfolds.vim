@@ -1,6 +1,6 @@
 " vim-sort-folds - Sort vim folds based on their first line.
-" Maintainer:   Brian Rodriguez
-" Version:      0.3.0
+" Maintainer:   Brian Rodriguez <brian@brianrodri.com>
+" Version:      0.3.1
 " License:      MIT license
 
 " What can I say? I love Python :)
