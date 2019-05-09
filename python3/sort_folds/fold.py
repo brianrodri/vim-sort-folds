@@ -91,7 +91,7 @@ class VimFold():
         Returns:
             slice.
         """
-        old_start, old_stop = aslice.start, aslice.stop
-        new_start = self._start + (0 if old_start is None else old_start)
-        new_stop = self._start + (self._stop if old_stop is None else old_stop)
-        return slice(new_start, new_stop, aslice.step)
+        return slice(
+            self._start if aslice.start is None else self._start + aslice.start,
+            self._stop if aslice.stop is None else self._start + aslice.stop,
+            aslice.step)
