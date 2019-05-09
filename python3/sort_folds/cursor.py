@@ -93,4 +93,4 @@ def in_vim_current_range(line_num):
     Returns:
         bool.
     """
-    return vim.current.range.start <= line_num <= vim.current.range.end
+    return vim.current.range.start <= (line_num - 1) <= vim.current.range.end
