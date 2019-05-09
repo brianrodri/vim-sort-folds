@@ -5,7 +5,7 @@ import vim  # pylint: disable=import-error
 
 
 class CursorRestorer(contextlib.ContextDecorator):
-    """Context manager which restores vim's cursor position at exit."""
+    """Restores vim's cursor position on exit."""
 
     def __init__(self):
         self._initial_cursor = None
@@ -18,49 +18,51 @@ class CursorRestorer(contextlib.ContextDecorator):
 
 
 def walk_folds():
-    """Yields ranges of line numbers enclosing the folds in vim's current range.
+    """Yields pairs of line numbers which enclose a fold in vim's current range.
 
     Yields:
-        tuple(int, int). The starting (inclusive) and ending (exclusive) line
+        tuple(int, int). The starting (inclusive) and stopping (exclusive) line
             numbers of a fold.
     """
     cursor = move_to_first_fold()
     while cursor is not None and is_in_current_vim_range(cursor):
-        fold_start, fold_end, cursor = (
-            cursor, perform_motion('zo]z') + 1, perform_motion('zj'))
+        fold_start, fold_stop = (cursor, perform_motion('zo]z') + 1)
+        cursor = perform_motion('zj')
         if (motion_failed(cursor, fold_start) or
                 fold_level(cursor) != fold_level(fold_start)):
             cursor = None
-        yield (fold_start, fold_end)
+        yield (fold_start, fold_stop)
 
 
 def move_to_first_fold():
-    """Places vim's cursor at the first fold intersecting vim's current range.
+    """Places cursor at the start of the first fold within vim's current range.
 
     Returns:
-        int or None. Line number to the beginning of the first fold intersecting
-            vim's current range, or None if no such fold exists.
+        int or None. Line number to start of the first fold, or None if no such
+            fold exists.
     """
     cursor = perform_motion(None)
     if not fold_level(cursor):
-        next_fold_start = perform_motion('zj')
-        if motion_failed(cursor, next_fold_start):
+        with CursorRestorer():
+            next_fold_start = perform_motion('zj')
+        if not motion_failed(cursor, next_fold_start):
+            cursor = perform_motion('zj')
+        else:
             return None
-        cursor = next_fold_start
     else:
         with CursorRestorer():
             prev_fold_start = perform_motion('zo[z')
         if (not motion_failed(cursor, prev_fold_start) and
                 fold_level(cursor) == fold_level(prev_fold_start)):
-            cursor = prev_fold_start
+            cursor = perform_motion('zo[z')
     return cursor if is_in_current_vim_range(cursor) else None
 
 
 def perform_motion(motion):
-    """Moves vim's cursor according to the given motion.
+    """Performs the given vim motion.
 
     Args:
-        motion: str or None. The motion to perform.
+        motion: str or None. The vim motion to perform.
 
     Returns:
         int. The line number of the cursor after moving.
@@ -70,36 +72,34 @@ def perform_motion(motion):
     return int(vim.eval('line(".")'))
 
 
-def motion_failed(cursor_from, cursor_to):
-    """Returns whether a motion failed.
-
-    We can tell if a vim motion failed by checking whether the cursor position
-    has changed.
+def motion_failed(cursor_start, cursor_stop):
+    """Returns whether a given motion failed.
 
     Args:
-        cursor_from: int.
-        cursor_to: int.
+        cursor_start: int.
+        cursor_stop: int.
 
     Returns:
         bool.
     """
-    return cursor_from == cursor_to
+    # NOTE: Vim's cursor does not move when a motion fails.
+    return cursor_start == cursor_stop
 
 
 def fold_level(line_num):
-    """Returns the fold level of the given line number.
+    """Returns fold level of the given line number.
 
     Args:
         line_num: int.
 
     Returns:
-        int. The fold level of the given line number.
+        int.
     """
     return int(vim.eval(f'foldlevel({line_num})'))
 
 
 def is_in_current_vim_range(line_num):
-    """Returns whether the given line number is enclosed by vim's current range.
+    """Returns whether the given line number is within vim's current range.
 
     Args:
         line_num: int.
