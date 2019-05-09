@@ -31,18 +31,23 @@ class VimFold():
         ['line A', 'line B', 'line C', 'line 3']
         >>> del fold[sequence]
         >>> sequence
-        ['line C', 'line 2', 'line 3']
+        ['line C', 'line 3']
     """
 
-    def __init__(self, start_line_num, stop_line_num):
+    def __init__(self, start, stop):
         """Initializes a new instance from the given pair of line numbers.
 
         Args:
-            start_line_num: int. Line number at which self starts (inclusive).
-            stop_line_num: int. Line number at which self stops (exclusive).
+            start: int. Line number at which self starts (inclusive).
+            stop: int. Line number at which self stops (exclusive).
+
+        Raises:
+            ValueError: Got an invalid bound because: start > stop.
         """
-        self._start = start_line_num - 1
-        self._stop = stop_line_num - 1
+        if start > stop:
+            raise ValueError(f'want: start <= stop, got: {start} > {stop}')
+        self._start = start - 1
+        self._stop = stop - 1
 
     def insert(self, index, value):
         """Inserts value into vim's current buffer at the index offset by self.
@@ -83,7 +88,7 @@ class VimFold():
             del key[self._start:self._stop]
 
     def _shifted(self, aslice):
-        """Returns a copy of the given slice that is shifted by self's position.
+        """Returns a copy of the given slice, but shifted by self's position.
 
         Args:
             aslice: slice.
@@ -91,7 +96,9 @@ class VimFold():
         Returns:
             slice.
         """
+        astart, astop, maxlen = aslice.start, aslice.stop, len(self)
+        clamp = lambda x: min(max(x, -maxlen), maxlen) % maxlen
         return slice(
-            self._start if aslice.start is None else self._start + aslice.start,
-            self._stop if aslice.stop is None else self._start + aslice.stop,
+            self._start if astart is None else self._start + clamp(astart),
+            self._stop if astop is None else self._start + clamp(astop),
             aslice.step)
