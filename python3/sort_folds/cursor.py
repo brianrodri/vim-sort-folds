@@ -42,17 +42,18 @@ def move_to_start_of_first_fold():
             fold exists.
     """
     cursor = perform_motion(None)
-    if fold_level(cursor) > 0:
+    if fold_level(cursor):
         with CursorRestorer():
             fstart = perform_motion('zo[z')
         if cursor != fstart and fold_level(cursor) == fold_level(fstart):
             return perform_motion('zo[z')
+        return cursor
     else:
         with CursorRestorer():
             fstart = perform_motion('zj')
         if cursor != fstart and in_vim_current_range(fstart):
             return perform_motion('zj')
-    return None
+        return None
 
 
 def perform_motion(motion):
