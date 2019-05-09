@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """Utility class for working with vim folds."""
 import vim  # pylint: disable=import-error
 

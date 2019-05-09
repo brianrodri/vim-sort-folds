@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """Utility classes and functions for working with vim's cursor."""
 import contextlib
 import vim  # pylint: disable=import-error
