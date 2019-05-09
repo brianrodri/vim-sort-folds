@@ -23,35 +23,37 @@ def walk_folds():
         tuple(int, int). The starting (inclusive) and stopping (exclusive) line
             numbers of a fold.
     """
-    cursor = move_to_start_of_first_fold()
-    while cursor is not None:
-        fstart, fstop = (cursor, perform_motion('zo]z') + 1)
-        cursor = perform_motion('zj')
-        if (cursor == fstart
-                or not in_vim_current_range(cursor)
-                or fold_level(cursor) != fold_level(fstart)):
-            cursor = None
-        yield (fstart, fstop)
+    fold_start = move_to_start_of_first_fold()
+    while fold_start is not None:
+        with CursorRestorer():
+            yield (fold_start, perform_motion('zo]z') + 1)
+        next_fold_start = perform_motion('zj')
+        if (next_fold_start != fold_start
+                and in_vim_current_range(next_fold_start)
+                and fold_level(next_fold_start) == fold_level(fold_start)):
+            fold_start = next_fold_start
+        else:
+            fold_start = None
 
 
 def move_to_start_of_first_fold():
     """Places cursor at the start of the first fold within vim's current range.
 
     Returns:
-        int or None. Line number to start of the first fold, or None if no such
-            fold exists.
+        int or None. Line number to the start of the first fold, or None if no
+          such fold exists.
     """
     cursor = perform_motion(None)
     if fold_level(cursor):
         with CursorRestorer():
             fstart = perform_motion('zo[z')
-        if cursor != fstart and fold_level(cursor) == fold_level(fstart):
+        if fstart != cursor and fold_level(fstart) == fold_level(cursor):
             return perform_motion('zo[z')
         return cursor
     else:
         with CursorRestorer():
             fstart = perform_motion('zj')
-        if cursor != fstart and in_vim_current_range(fstart):
+        if fstart != cursor and in_vim_current_range(fstart):
             return perform_motion('zj')
         return None
 
