@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Defines utility class for working with vim folds."""
+"""Utility class for working with vim folds."""
 import vim  # pylint: disable=import-error
 
 
@@ -18,8 +18,8 @@ class VimFold():
         >>> fold[1]
         'asdf'
 
-    Folds can also be indexed with a sequence. This allows the fold to behave
-    like a list-slice of *that* sequence instead.
+    Folds can also be indexed with a sequence, which makes a real slice of that
+    sequence using the fold's positioning.
 
     Example:
         >>> fold = VimFold(start_line_num=1, stop_line_num=3)
@@ -53,23 +53,11 @@ class VimFold():
         """
         vim.current.buffer.insert(self._start + index, value)
 
-    def _shifted(self, aslice):
-        """Returns a copy of the given slice, but shifted by self's position.
-
-        Args:
-            aslice: slice.
-
-        Returns:
-            slice.
-        """
-        shift = self._start
-        return slice(aslice.start + shift, aslice.stop + shift, aslice.step)
+    def __iter__(self):
+        return (vim.current.buffer[i] for i in range(self._start, self._stop))
 
     def __len__(self):
         return self._stop - self._start
-
-    def __iter__(self):
-        return (vim.current.buffer[i] for i in range(self._start, self._stop))
 
     def __getitem__(self, key):
         if isinstance(key, int):
@@ -93,3 +81,15 @@ class VimFold():
             del vim.current.buffer[self._shifted(key)]
         else:
             del key[self._start:self._stop]
+
+    def _shifted(self, aslice):
+        """Returns a copy of the given slice that is shifted by self's position.
+
+        Args:
+            aslice: slice.
+
+        Returns:
+            slice.
+        """
+        shift = self._start
+        return slice(aslice.start + shift, aslice.stop + shift, aslice.step)
