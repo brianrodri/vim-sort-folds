@@ -20,7 +20,7 @@ def sort_folds(line_index_key=0):
         sorted_folds = sorted(folds, key=lambda f: f[line_index_key].lower())
         initial_buffer = vim.current.buffer[:]
         for old_fold, new_fold in reversed(list(zip(folds, sorted_folds))):
-            old_fold[vim.current.buffer] = new_fold[initial_buffer]
+            old_fold[:] = new_fold[initial_buffer]
         present_result()
 
 
