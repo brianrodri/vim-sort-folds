@@ -41,7 +41,7 @@ class VimFold():
             stop: int. Line number at which self stops (exclusive).
 
         Raises:
-            ValueError: Got an invalid bound because: start > stop.
+            ValueError: Got an invalid bound (start > stop).
         """
         if start > stop:
             raise ValueError(f'want: start <= stop, got: {start} > {stop}')
