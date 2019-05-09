@@ -55,7 +55,7 @@ class VimFold():
             index: int.
             value: str.
         """
-        vim.current.buffer.insert(self._start + index, value)
+        vim.current.buffer.insert(self._clamp(index), value)
 
     def __iter__(self):
         return (vim.current.buffer[i] for i in range(self._start, self._stop))
@@ -65,14 +65,14 @@ class VimFold():
 
     def __getitem__(self, key):
         if isinstance(key, int):
-            return vim.current.buffer[self._start + key]
+            return vim.current.buffer[self._clamp(key)]
         if isinstance(key, slice):
             return vim.current.buffer[self._shifted(key)]
         return key[self._start:self._stop]
 
     def __setitem__(self, key, value):
         if isinstance(key, int):
-            vim.current.buffer[self._start + key] = value
+            vim.current.buffer[self._clamp(key)] = value
         elif isinstance(key, slice):
             vim.current.buffer[self._shifted(key)] = value
         else:
@@ -80,11 +80,23 @@ class VimFold():
 
     def __delitem__(self, key):
         if isinstance(key, int):
-            del vim.current.buffer[self._start + key]
+            del vim.current.buffer[self._clamp(key)]
         elif isinstance(key, slice):
             del vim.current.buffer[self._shifted(key)]
         else:
             del key[self._start:self._stop]
+
+    def _clamp(self, index):
+        """Returns transformation of given index which respects self's position.
+
+        Args:
+            index: int. A 0-based index.
+
+        Returns:
+            int. An index such that self._start <= clamped_index <= self._stop.
+        """
+        clamped_index = min(max(index, -len(self)), len(self)) % (len(self) + 1)
+        return self._start + clamped_index
 
     def _shifted(self, aslice):
         """Returns a copy of the given slice, but shifted by self's position.
@@ -95,9 +107,7 @@ class VimFold():
         Returns:
             slice.
         """
-        astart, astop, maxlen = aslice.start, aslice.stop, len(self)
-        clamp = lambda x: min(max(x, -maxlen), maxlen) % maxlen
         return slice(
-            self._start if astart is None else self._start + clamp(astart),
-            self._stop if astop is None else self._start + clamp(astop),
+            self._start if aslice.start is None else self._clamp(aslice.start),
+            self._stop if aslice.stop is None else self._clamp(aslice.stop),
             aslice.step)
