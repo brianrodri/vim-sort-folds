@@ -13,25 +13,10 @@ class VimFold(collections.abc.MutableSequence):  # pylint: disable=too-many-ance
     Example:
         >>> fold = VimFold(start_line_num=2, stop_line_num=5)
         >>> fold.insert(0, 'something')
-        # 'asdf' is now the second line in vim's current buffer. All subsequent
-        # lines have been pushed by one.
+        # 'something' is now the second line in vim's current buffer. All
+        # subsequent lines have been pushed by one.
         >>> fold[1]
-        'asdf'
-
-    Folds can also be indexed with a sequence, which returns an actual slice of
-    that sequence with respect to the fold's range.
-
-    Example:
-        >>> fold = VimFold(start_line_num=1, stop_line_num=3)
-        >>> sequence = ['line 1', 'line 2', 'line 3']
-        >>> fold[sequence]
-        ['line 1', 'line 2']
-        >>> fold[sequence] = ['line A', 'line B', 'line C']
-        >>> sequence
-        ['line A', 'line B', 'line C', 'line 3']
-        >>> del fold[sequence]
-        >>> sequence
-        ['line C', 'line 3']
+        'something'
     """
 
     def __init__(self, start, stop):
@@ -49,6 +34,16 @@ class VimFold(collections.abc.MutableSequence):  # pylint: disable=too-many-ance
         self._start = start - 1
         self._stop = stop - 1
 
+    @property
+    def start(self):
+        """Read-only access to start index of self."""
+        return self._start
+
+    @property
+    def stop(self):
+        """Read-only access to stop index of self."""
+        return self._stop
+
     def insert(self, index, value):
         """Inserts value into vim's current buffer at the index offset by self.
 
@@ -60,7 +55,7 @@ class VimFold(collections.abc.MutableSequence):  # pylint: disable=too-many-ance
 
     def __eq__(self, other):
         if other.__class__ is self.__class__:
-            return (self._start, self._stop) == (other._start, other._stop)
+            return (self._start, self._stop) == (other.start, other.stop)
         return NotImplemented
 
     __hash__ = None
@@ -76,7 +71,7 @@ class VimFold(collections.abc.MutableSequence):  # pylint: disable=too-many-ance
             return vim.current.buffer[self._clamp(key, strict=True)]
         if isinstance(key, slice):
             return vim.current.buffer[self._shifted(key)]
-        return key[self._start:self._stop]
+        raise IndexError(f'invalid index: {key!r}')
 
     def __setitem__(self, key, value):
         if isinstance(key, int):
@@ -84,7 +79,7 @@ class VimFold(collections.abc.MutableSequence):  # pylint: disable=too-many-ance
         elif isinstance(key, slice):
             vim.current.buffer[self._shifted(key)] = value
         else:
-            key[self._start:self._stop] = value
+            raise IndexError(f'invalid index: {key!r}')
 
     def __delitem__(self, key):
         if isinstance(key, int):
@@ -92,7 +87,7 @@ class VimFold(collections.abc.MutableSequence):  # pylint: disable=too-many-ance
         elif isinstance(key, slice):
             del vim.current.buffer[self._shifted(key)]
         else:
-            del key[self._start:self._stop]
+            raise IndexError(f'invalid index: {key!r}')
 
     def _shifted(self, aslice):
         """Returns a copy of the given slice, but shifted by self's position.
@@ -118,7 +113,7 @@ class VimFold(collections.abc.MutableSequence):  # pylint: disable=too-many-ance
                 the fold's range.
 
         Returns:
-            int. An index, i, such that: self._start <= i <= self._stop.
+            int. An index, i, such that: self.start <= i <= self.stop.
 
         Raises:
             IndexError: When called with an out-of-range index in strict mode.
