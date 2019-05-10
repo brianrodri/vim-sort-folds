@@ -1,8 +1,9 @@
 """Utility class for working with vim folds."""
+import collections
 import vim  # pylint: disable=import-error
 
 
-class VimFold():
+class VimFold(collections.abc.MutableSequence):  # pylint: disable=too-many-ancestors
     """Interface for working with vim folds as if they were a mutable sequence.
 
     Folds behave like a slice of vim's current buffer. No slicing actually
