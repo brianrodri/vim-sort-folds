@@ -1,44 +1,24 @@
 """Utility class for working with vim folds."""
-import enum
 import vim  # pylint: disable=import-error
-
-
-class _Bounds(enum.Enum):
-    """Describes which range of values into a fold's elements are valid.
-
-    Used by Fold to help emulate "real" lists.
-    """
-    INDICES = enum.auto()  # Requires: 0 <= value < len(fold)
-    SIZES = enum.auto()  # Requires: 0 <= value <= len(fold)
-    UNBOUNDED = enum.auto()  # No requirements.
-
-    def validate(self, fold, value):
-        """Returns whether the given value is within the bounds of the fold."""
-        if self is INDICES:
-            return -len(fold) <= value < len(fold)
-        if self is SIZES:
-            return -len(fold) <= value <= len(fold)
-        if self is UNBOUNDED:
-            return True
 
 
 class VimFold():
     """Interface for working with vim folds as if they were a mutable sequence.
 
-    Folds behave like a list-slice taken from vim's current buffer. No slicing
-    actually happens, however, because they only hold indices into the buffer.
-    Regardless, actions performed on folds modify the buffer directly.
+    Folds behave like a slice of vim's current buffer. No slicing actually
+    occurs, however, as they only hold indices into the buffer. Regardless,
+    actions performed on folds modify the buffer directly.
 
     Example:
         >>> fold = VimFold(start_line_num=2, stop_line_num=5)
-        >>> fold.insert(0, 'asdf')
+        >>> fold.insert(0, 'something')
         # 'asdf' is now the second line in vim's current buffer. All subsequent
         # lines have been pushed by one.
         >>> fold[1]
         'asdf'
 
-    Folds can also be indexed with a sequence, which makes a real slice of that
-    sequence using the fold's positioning.
+    Folds can also be indexed with a sequence, which returns an actual slice of
+    that sequence with respect to the fold's range.
 
     Example:
         >>> fold = VimFold(start_line_num=1, stop_line_num=3)
@@ -61,10 +41,10 @@ class VimFold():
             stop: int. Line number at which self stops (exclusive).
 
         Raises:
-            ValueError: Got an invalid bound (start > stop).
+            IndexError: range is invalid.
         """
         if start > stop:
-            raise ValueError(f'want: start <= stop, got: {start} > {stop}')
+            raise IndexError(f'range is invalid: start={start} > stop={stop}')
         self._start = start - 1
         self._stop = stop - 1
 
@@ -75,7 +55,7 @@ class VimFold():
             index: int.
             value: str.
         """
-        vim.current.buffer.insert(self._clamp(index, _Bounds.SIZES), value)
+        vim.current.buffer.insert(self._clamp(index), value)
 
     def __iter__(self):
         return (vim.current.buffer[i] for i in range(self._start, self._stop))
@@ -85,14 +65,14 @@ class VimFold():
 
     def __getitem__(self, key):
         if isinstance(key, int):
-            return vim.current.buffer[self._clamp(key, _Bounds.INDICES)]
+            return vim.current.buffer[self._clamp(key, strict=True)]
         if isinstance(key, slice):
             return vim.current.buffer[self._shifted(key)]
         return key[self._start:self._stop]
 
     def __setitem__(self, key, value):
         if isinstance(key, int):
-            vim.current.buffer[self._clamp(key, _Bounds.INDICES)] = value
+            vim.current.buffer[self._clamp(key, strict=True)] = value
         elif isinstance(key, slice):
             vim.current.buffer[self._shifted(key)] = value
         else:
@@ -100,7 +80,7 @@ class VimFold():
 
     def __delitem__(self, key):
         if isinstance(key, int):
-            del vim.current.buffer[self._clamp(key, _Bounds.INDICES)]
+            del vim.current.buffer[self._clamp(key, strict=True)]
         elif isinstance(key, slice):
             del vim.current.buffer[self._shifted(key)]
         else:
@@ -120,21 +100,24 @@ class VimFold():
             self._stop if aslice.stop is None else self._clamp(aslice.stop),
             aslice.step)
 
-    def _clamp(self, index, bounds=_Bounds.UNBOUNDED):
-        """Calculates corresponding index into fold from given 0-based index.
+    def _clamp(self, index, strict=False):
+        """Calculates the range-respecting value of the given 0-based index.
 
         Args:
-            index: int. 0-based index into the fold's elements.
-            strict: bool. Whether to raise an error when index is out of range.
+            index: int. 0-based index into the fold's slice. Negative values are
+                allowed, and behave as they would for lists.
+            strict: bool. Whether to raise an error when the index is out of
+                the fold's range.
 
         Returns:
-            int. An index i such that: self._start <= i <= self._stop.
-            bounds: _Bounds. How to determine whether the index is out of range.
+            int. An index, i, such that: self._start <= i <= self._stop.
 
         Raises:
-            IndexError: When the index is out of bounds.
+            IndexError: When called with an out-of-range index in strict mode.
         """
-        if not bounds.validate(self, index):
-            raise IndexError('list index out of bounds')
-        clamped_index = min(max(index, -len(self)), len(self)) % (len(self) + 1)
+        self_len = len(self)
+        if strict and not -self_len <= index < self_len:
+            raise IndexError('list index out of range')
+        clamped_index = (
+            max(index + self_len, 0) if index < 0 else min(index, self_len))
         return self._start + clamped_index
