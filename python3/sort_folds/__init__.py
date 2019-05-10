@@ -21,8 +21,8 @@ def sort_folds(line_index_key=0):
         for old_fold, new_fold in zip(folds, sorted_folds):
             if old_fold != new_fold:
                 fold_lines_to_reorder.append((old_fold, new_fold[:]))
-        for fold, lines in reversed(fold_lines_to_reorder):
-            fold[:] = lines
+        for old_fold, new_lines in reversed(fold_lines_to_reorder):
+            old_fold[:] = new_lines
         present_result()
 
 
