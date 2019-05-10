@@ -50,12 +50,11 @@ def move_to_start_of_first_fold():
         if fstart != cursor and fold_level(fstart) == fold_level(cursor):
             return perform_motion('zo[z')
         return cursor
-    else:
-        with CursorRestorer():
-            fstart = perform_motion('zj')
-        if fstart != cursor and in_vim_current_range(fstart):
-            return perform_motion('zj')
-        return None
+    with CursorRestorer():
+        fstart = perform_motion('zj')
+    if fstart != cursor and in_vim_current_range(fstart):
+        return perform_motion('zj')
+    return None
 
 
 def perform_motion(motion):
