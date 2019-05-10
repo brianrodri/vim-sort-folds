@@ -44,27 +44,24 @@ class VimFold(collections.abc.MutableSequence):  # pylint: disable=too-many-ance
         """Read-only access to stop index of self."""
         return self._stop
 
-    def insert(self, index, value):
-        """Inserts value into vim's current buffer at the index offset by self.
+    def __repr__(self):
+        return (
+            f'{self.__class__.__qualname__}('
+            f'start={self._start}, stop={self._stop}, '
+            f'lines_view=[{", ".join(self)}])')
 
-        Args:
-            index: int.
-            value: str.
-        """
-        vim.current.buffer.insert(self._clamp(index), value)
+    __hash__ = None
 
     def __eq__(self, other):
         if other.__class__ is self.__class__:
             return (self._start, self._stop) == (other.start, other.stop)
         return NotImplemented
 
-    __hash__ = None
+    def __len__(self):
+        return self._stop - self._start
 
     def __iter__(self):
         return (vim.current.buffer[i] for i in range(self._start, self._stop))
-
-    def __len__(self):
-        return self._stop - self._start
 
     def __getitem__(self, key):
         if isinstance(key, int):
@@ -88,6 +85,15 @@ class VimFold(collections.abc.MutableSequence):  # pylint: disable=too-many-ance
             del vim.current.buffer[self._shifted(key)]
         else:
             raise IndexError(f'invalid index: {key!r}')
+
+    def insert(self, index, value):
+        """Inserts value into vim's current buffer at the index offset by self.
+
+        Args:
+            index: int.
+            value: str.
+        """
+        vim.current.buffer.insert(self._clamp(index), value)
 
     def _shifted(self, aslice):
         """Returns a copy of the given slice, but shifted by self's position.
