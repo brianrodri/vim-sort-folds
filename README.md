@@ -4,16 +4,11 @@
 
 ![](https://raw.github.com/obreitwi/vim-sort-folds/master/doc/demo.gif)
 
-Sorting folds is tedious in vanilla vim. You would need to join all lines of a fold, sort the joined
-lines, then split them back up. Much more involved than most other things vim allows you to do,
-especially with motions.
+Sorting folds is tedious in vanilla vim. You must join all lines of a fold, sort the joined lines, then split them back up. This is much more involved than most other things that vim allows you to do...
 
-This plugin aims to solves that issue: it provides a command to sort the folds of a visually
-selected region, while keeping them in tact. Since folds can be created in a variety of ways, it is
-especially handy for sorting arbitrary groups of text based on their first line.
+Enter: `vim-sort-folds`! It aims to solve this issue by introducing a command to sort the folds in a visually selected region. Since folds can be created in a variety of ways, it is especially handy for sorting arbitrary groups of text based on their first line.
 
-One use-case (demonstrated above, and the motivation of the original author of this plugin) is to
-sort functions alphabetically after the fact.
+NOTE: this plugin (unapologetically) requires `+python3`.
 
 
 ## Installation
