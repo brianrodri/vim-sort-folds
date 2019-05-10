@@ -11,7 +11,7 @@ class VimFold(collections.abc.MutableSequence):  # pylint: disable=too-many-ance
     actions performed on folds modify the buffer directly.
 
     Example:
-        >>> fold = VimFold(start_line_num=2, stop_line_num=5)
+        >>> fold = VimFold(start=2, stop=5)
         >>> fold.insert(0, 'something')
         >>> fold[1]
         'something'
