@@ -13,8 +13,6 @@ class VimFold(collections.abc.MutableSequence):  # pylint: disable=too-many-ance
     Example:
         >>> fold = VimFold(start_line_num=2, stop_line_num=5)
         >>> fold.insert(0, 'something')
-        # 'something' is now the second line in vim's current buffer. All
-        # subsequent lines have been pushed by one.
         >>> fold[1]
         'something'
     """
