@@ -41,7 +41,7 @@ def move_to_start_of_first_fold():
 
     Returns:
         int or None. Line number to the start of the first fold, or None if no
-          such fold exists.
+            such fold exists.
     """
     cursor = perform_motion(None)
     if fold_level(cursor):
