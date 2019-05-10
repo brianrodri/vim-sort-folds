@@ -58,6 +58,13 @@ class VimFold(collections.abc.MutableSequence):  # pylint: disable=too-many-ance
         """
         vim.current.buffer.insert(self._clamp(index), value)
 
+    def __eq__(self, other):
+        if other.__class__ is self.__class__:
+            return (self._start, self._stop) == (other._start, other._stop)
+        return NotImplemented
+
+    __hash__ = None
+
     def __iter__(self):
         return (vim.current.buffer[i] for i in range(self._start, self._stop))
 
