@@ -7,13 +7,13 @@ class CursorRestorer(contextlib.ContextDecorator):
     """Restores vim's cursor position on exit."""
 
     def __init__(self):
-        self._initial_cursor = None
+        self._cursor_to_restore = None
 
     def __enter__(self):
-        self._initial_cursor = vim.current.window.cursor
+        self._cursor_to_restore = vim.current.window.cursor
 
     def __exit__(self, *unused_exc_info):
-        vim.current.window.cursor = self._initial_cursor
+        vim.current.window.cursor = self._cursor_to_restore
 
 
 def walk_folds():
@@ -25,12 +25,11 @@ def walk_folds():
     """
     fold_start = move_to_start_of_first_fold()
     while fold_start is not None:
-        with CursorRestorer():
-            yield (fold_start, perform_motion('zo]z') + 1)
+        yield (fold_start, perform_motion('zo]z') + 1)
         next_fold_start = perform_motion('zj')
         if (next_fold_start != fold_start
-                and in_vim_current_range(next_fold_start)
-                and fold_level(next_fold_start) == fold_level(fold_start)):
+                and fold_level(next_fold_start) == fold_level(fold_start)
+                and in_vim_current_range(next_fold_start)):
             fold_start = next_fold_start
         else:
             fold_start = None
@@ -43,16 +42,16 @@ def move_to_start_of_first_fold():
         int or None. Line number to the start of the first fold, or None if no
             such fold exists.
     """
-    cursor = perform_motion(None)
-    if fold_level(cursor):
+    cur_line = perform_motion(f'{vim.current.range.start + 1}G')
+    if fold_level(cur_line):
         with CursorRestorer():
-            fstart = perform_motion('zo[z')
-        if fstart != cursor and fold_level(fstart) == fold_level(cursor):
+            parent_fold_start = perform_motion('zo[z')
+        if fold_level(parent_fold_start) == fold_level(cur_line):
             return perform_motion('zo[z')
-        return cursor
+        return cur_line
     with CursorRestorer():
-        fstart = perform_motion('zj')
-    if fstart != cursor and in_vim_current_range(fstart):
+        first_fold_start = perform_motion('zj')
+    if first_fold_start != cur_line and in_vim_current_range(first_fold_start):
         return perform_motion('zj')
     return None
 

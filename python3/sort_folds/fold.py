@@ -122,7 +122,7 @@ class VimFold(collections.abc.MutableSequence):  # pylint: disable=too-many-ance
             int. An index, i, such that: self.start <= i <= self.stop.
 
         Raises:
-            IndexError: When called with an out-of-range index in strict mode.
+            IndexError: when called with an out-of-range index in strict mode.
         """
         self_len = len(self)
         if strict and not -self_len <= index < self_len:
