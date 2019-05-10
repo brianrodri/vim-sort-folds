@@ -1,11 +1,10 @@
-#!/usr/bin/env python3
 """Sort vim folds based on their first line."""
 from sort_folds import cursor
 from sort_folds import fold
 import vim  # pylint: disable=import-error
 
 __all__ = ['sort_folds']
-__version__ = '0.3.1'
+__version__ = '1.0.0'
 
 
 def sort_folds(line_index_key=0):
