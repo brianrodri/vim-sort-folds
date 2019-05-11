@@ -28,7 +28,7 @@ line, you can do by directly calling `sortfolds#SortFolds` with the given line
 number. Lines in folds are zero-indexed. That means to sort based on the 42th
 line you would map:
 >
-  vmap <silent> <Leader>sf :call sortfolds#SortFolds(41)<CR>
+  vnoremap <silent> <Leader>sf :call sortfolds#SortFolds(41)<CR>
 <
 ==============================================================================
                                                       *sortfolds-requirements*
