@@ -3,20 +3,6 @@ import contextlib
 import vim  # pylint: disable=import-error
 
 
-class CursorRestorer(contextlib.ContextDecorator):
-    """Restores vim's cursor position on exit."""
-
-    def __init__(self):
-        self._cursor_to_restore = None
-
-    def __enter__(self):
-        self._cursor_to_restore = vim.current.window.cursor
-
-    def __exit__(self, *unused_exc_info):
-        vim.current.window.cursor = self._cursor_to_restore
-
-
-@CursorRestorer()
 def walk_folds():
     """Yields pairs of line numbers which enclose a fold in vim's current range.
 
@@ -26,7 +12,7 @@ def walk_folds():
     """
     fold_start = move_to_start_of_first_fold()
     while fold_start is not None:
-        yield fold_start - 1, perform_motion('zo]z')
+        yield (fold_start - 1, perform_motion('zo' ']z'))
         next_fold_start = perform_motion('zj')
         if (next_fold_start != fold_start
                 and fold_level(next_fold_start) == fold_level(fold_start)
@@ -43,18 +29,28 @@ def move_to_start_of_first_fold():
         int or None. Line number to the start of the first fold within vim's
             current range, or None if there isn't one.
     """
-    cur_line = perform_motion(f'{vim.current.range.start + 1}G')
+    cur_line = perform_motion('`<')
     if fold_level(cur_line):
-        with CursorRestorer():
-            parent_fold_start = perform_motion('zo[z')
+        with cursor_restorer():
+            parent_fold_start = perform_motion('zo' '[z')
         if fold_level(parent_fold_start) == fold_level(cur_line):
-            return perform_motion('zo[z')
+            return perform_motion('zo' '[z')
         return cur_line
-    with CursorRestorer():
+    with cursor_restorer():
         first_fold_start = perform_motion('zj')
     if first_fold_start != cur_line and in_vim_current_range(first_fold_start):
         return perform_motion('zj')
     return None
+
+
+@contextlib.contextmanager
+def cursor_restorer():
+    """Restores vim's cursor position on exit."""
+    cursor_to_restore = vim.current.window.cursor
+    try:
+        yield
+    finally:
+        vim.current.window.cursor = cursor_to_restore
 
 
 def perform_motion(motion):

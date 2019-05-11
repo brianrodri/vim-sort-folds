@@ -1,24 +1,24 @@
-# vim-sort-folds
+# `vim-sort-folds`
 
 ## Overview
 
 ![](https://raw.github.com/obreitwi/vim-sort-folds/master/doc/demo.gif)
 
-Sorting folds is tedious in vanilla vim. You must join all lines of each fold, sort the joined lines, then split them back up. This is much more involved than most other things that vim allows you to do...
+Sorting folds is tedious in vanilla vim. It requires us to:
+ 1. Join the lines of each fold
+ 2. Sort the joined lines
+ 3. Split the lines back up
 
-Enter: `vim-sort-folds`! It aims to solve this issue by introducing a command to sort the folds in a visually selected region. Since folds can be created in a variety of ways, it is especially handy for sorting arbitrary groups of text based on their first line.
+This is much more involved than most other things vim allows us to do...
 
-NOTE: this plugin (unapologetically) requires `+python3`.
+**Enter: `vim-sort-folds`!** It aims to solve this issue by introducing a command to sort the folds of a visually selected region. Since folds can be created in a variety of ways, this can be especially handy for sorting arbitrary groups of content based on their first line.
 
 
 ## Installation
 
-`vim-sort-folds` is compatible with most of the commonly used plugin managers for vim. Just drop
-something like the following lines somewhere in your `.vimrc`:
+`vim-sort-folds` is compatible with most of the commonly used plugin managers for vim. Just drop something like the following lines somewhere in your `.vimrc`:
 
  - `Plug 'brianrodri/vim-sort-folds'` (for [vim-plug](https://github.com/junegunn/vim-plug))
  - `Plugin 'brianrodri/vim-sort-folds'` (for [Vundle](https://github.com/VundleVim/Vundle.vim))
 
-
-## Note: manual foldmethod
-This plugin is untested, and is not expected to work when `foldmethod` is set to `manual` (for now).
+_**NOTE**: this plugin (unapologetically) requires `+python3`._

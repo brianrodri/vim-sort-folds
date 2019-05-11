@@ -6,12 +6,12 @@ import vim  # pylint: disable=import-error
 class VimFold(collections.abc.MutableSequence):  # pylint: disable=too-many-ancestors
     """Interface for working with vim folds as if they were a mutable sequence.
 
-    Folds behave like a slice of vim's current buffer. No slicing actually
-    occurs, however, unless explicitly requested by the slice operations. All
+    VimFold behaves like a slice of vim's current buffer. No slicing actually
+    occurs, however, unless explicitly requested through slice operations. All
     other actions performed on folds modify the corresponding range in the
-    buffer directly.
+    buffer directly while interfacing through fold-relative indices.
 
-    Example:
+    For example:
         >>> fold = VimFold(start=1, stop=4)
         >>> fold.insert(0, 'something')
         >>> vim.current.buffer[1]
@@ -22,8 +22,10 @@ class VimFold(collections.abc.MutableSequence):  # pylint: disable=too-many-ance
         """Initializes a new instance from the given pair of indices.
 
         Args:
-            start: int. Index at which a fold starts (inclusive).
-            stop: int. Index at which a fold stops (exclusive).
+            start: int. An (inclusive) index into vim's current buffer at which
+                a fold starts.
+            stop: int. An (exclusive) index into vim's current buffer at which a
+                fold stops.
 
         Raises:
             IndexError: range is invalid.
@@ -34,12 +36,12 @@ class VimFold(collections.abc.MutableSequence):  # pylint: disable=too-many-ance
 
     @property
     def start(self):
-        """Returns read-only access to self's start index."""
+        """Provides read-only access to start index."""
         return self._start
 
     @property
     def stop(self):
-        """Returns read-only access to self's stop index."""
+        """Provides read-only access to stop index."""
         return self._stop
 
     def __repr__(self):
@@ -60,32 +62,32 @@ class VimFold(collections.abc.MutableSequence):  # pylint: disable=too-many-ance
         return (vim.current.buffer[i] for i in range(self._start, self._stop))
 
     def __getitem__(self, key):
-        return vim.current.buffer[self._abs(key)]
+        return vim.current.buffer[self._abs_key(key)]
 
     def __setitem__(self, key, value):
-        vim.current.buffer[self._abs(key)] = value
+        vim.current.buffer[self._abs_key(key)] = value
 
     def __delitem__(self, key):
-        del vim.current.buffer[self._abs(key)]
+        del vim.current.buffer[self._abs_key(key)]
 
     def insert(self, index, value):
-        """Inserts value into vim's current buffer at given fold-relative index.
+        """Inserts value into vim's current buffer at the fold-relative index.
 
         Args:
             index: int.
             value: str.
         """
-        vim.current.buffer.insert(self._abs_position(index), value)
+        vim.current.buffer.insert(self._abs(index), value)
         self._stop += 1
 
-    def _abs(self, key):
-        """Returns corresponding absolute value of given fold-relative key.
+    def _abs_key(self, key):
+        """Returns absolute value of the fold-relative key.
 
         Args:
-            key: *. The relative key of the fold.
+            key: *.
 
         Returns:
-            *. The corresponding absolute key of vim's current buffer.
+            *. A corresponding key into vim's current buffer.
         """
         if isinstance(key, int):
             return self._abs_index(key)
@@ -94,43 +96,42 @@ class VimFold(collections.abc.MutableSequence):  # pylint: disable=too-many-ance
         return key
 
     def _abs_index(self, idx):
-        """Returns corresponding absolute value of given fold-relative index.
+        """Returns absolute value of the fold-relative index.
 
         Args:
-            idx: int. The relative index into the fold.
+            idx: int.
 
         Returns:
-            int. The corresponding absolute index of vim's current buffer.
+            int. A corresponding index into vim's current buffer.
 
         Raises:
             IndexError: the relative index is out of the fold's range.
         """
         if not -len(self) <= idx < len(self):
             raise IndexError('list index out of range')
-        return self._abs_position(idx)
+        return self._abs(idx)
 
     def _abs_slice(self, sli):
-        """Returns corresponding absolute value of given fold-relative slice.
+        """Returns absolute value of the fold-relative slice.
 
         Args:
-            sli: slice. A relative slice into the fold.
+            sli: slice.
 
         Returns:
-            slice. The corresponding absolute slice of vim's current buffer.
+            slice. A corresponding slice into vim's current buffer.
         """
-        return slice(
-            self._start if sli.start is None else self._abs_position(sli.start),
-            self._stop if sli.stop is None else self._abs_position(sli.stop),
-            sli.step)
+        return slice(self._start if sli.start is None else self._abs(sli.start),
+                     self._stop if sli.stop is None else self._abs(sli.stop),
+                     sli.step)
 
-    def _abs_position(self, pos):
-        """Returns corresponding absolute value of given fold-relative position.
+    def _abs(self, pos):
+        """Returns absolute value of the fold-relative position.
 
         Args:
-            pos: int. A relative position in fold.
+            pos: int.
 
         Returns:
-            int. The corresponding absolute position of vim's current buffer.
+            int. The corresponding position in vim's current buffer.
         """
         abs_pos = max(pos + len(self), 0) if pos < 0 else min(pos, len(self))
         return self._start + abs_pos
