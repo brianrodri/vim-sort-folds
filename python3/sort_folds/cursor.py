@@ -29,7 +29,7 @@ def move_to_start_of_first_fold():
         int or None. Line number to the start of the first fold within vim's
             current range, or None if there isn't one.
     """
-    cur_line = perform_motion('`<')
+    cur_line = perform_motion('<nop>')
     if fold_level(cur_line):
         with cursor_restorer():
             parent_fold_start = perform_motion('zo' '[z')
