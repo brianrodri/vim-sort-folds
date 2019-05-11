@@ -44,6 +44,11 @@ class VimFold(collections.abc.MutableSequence):  # pylint: disable=too-many-ance
         """Provides read-only access to stop index."""
         return self._stop
 
+    @property
+    def lines(self):
+        """Returns a copy of the lines within fold."""
+        return vim.current.buffer[self._start:self._stop]
+
     def __repr__(self):
         class_qualname = self.__class__.__qualname__
         return f'{class_qualname}(start={self._start}, stop={self._stop})'
