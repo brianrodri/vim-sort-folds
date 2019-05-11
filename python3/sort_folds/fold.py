@@ -78,7 +78,6 @@ class VimFold(collections.abc.MutableSequence):  # pylint: disable=too-many-ance
             value: str.
         """
         vim.current.buffer.insert(self._abs(index), value)
-        self._stop += 1
 
     def _abs_key(self, key):
         """Returns absolute value of the fold-relative key.
