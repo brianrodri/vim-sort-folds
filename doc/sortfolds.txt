@@ -13,23 +13,8 @@ while keeping closed folds intact. Since folds can be created in a variety of
 ways (|fold-methods|), it is therefore straight-forward to sort arbitrary
 groups of text based on their first line.
 
-One use-case is to sort functions alphabetically after the fact.
+My personal use-case is to sort the plugins I keep in my vimrc.
 
-NOTE: This plugin was not tested and is not expected to work with `foldmethod`
-set to `manual` yet.
-
-==============================================================================
-                                                  *sortfolds-custom-sort-line*
-Sorting by other lines ~
-
-Per default folds are sorted based on the contents of the first line in each
-fold. If, for some reason, you need to sort folds by the contents of another
-line, you can do by directly calling `sortfolds#SortFolds` with the given line
-number. Lines in folds are zero-indexed. That means to sort based on the 42th
-line you would map:
->
-  vnoremap <silent> <Leader>sf :call sortfolds#SortFolds(41)<CR>
-<
 ==============================================================================
                                                       *sortfolds-requirements*
 Requirements ~
