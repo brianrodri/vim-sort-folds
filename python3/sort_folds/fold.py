@@ -45,8 +45,8 @@ class VimFold(collections.abc.MutableSequence):  # pylint: disable=too-many-ance
         return self._stop
 
     def __repr__(self):
-        class_qualname = self.__class__.__qualname__
-        return f'{class_qualname}(start={self._start}, stop={self._stop})'
+        cls = self.__class__.__qualname__
+        return f'{cls}(start={self._start}, stop={self._stop})'
 
     __hash__ = None
 
@@ -107,9 +107,9 @@ class VimFold(collections.abc.MutableSequence):  # pylint: disable=too-many-ance
         Raises:
             IndexError: the relative index is out of the fold's range.
         """
-        if not -len(self) <= idx < len(self):
-            raise IndexError('list index out of range')
-        return self._abs(idx)
+        if -len(self) <= idx < len(self):
+            return self._abs(idx)
+        raise IndexError('list index out of range')
 
     def _abs_slice(self, sli):
         """Returns absolute value of the fold-relative slice.
