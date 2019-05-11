@@ -1,10 +1,10 @@
-*vim-sort-folds*  Sort vim folds based on their first line
+*vim-sort-folds*	Sort vim folds based on their first line
 
 ==============================================================================
                                                              *sortfolds-usage*
 Usage ~
 
-Visually select the folds you'd like to be sorted, then:
+Visually select the folds you'd like to sort, then:
 >
  :call sortfolds#SortFolds()
 <
