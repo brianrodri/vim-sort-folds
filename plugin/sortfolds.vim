@@ -22,6 +22,6 @@ if !has('python3')
   finish
 endif
 
-vnoremap <silent> <Plug>SortFolds :call sortfolds#SortFolds()<CR>
+vnoremap <silent> <Plug>SortFolds :call sortfolds#SortFolds()
 
 call s:RestoreCpo()
