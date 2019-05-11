@@ -7,9 +7,9 @@ class VimFold(collections.abc.MutableSequence):  # pylint: disable=too-many-ance
     """Interface for working with vim folds as if they were a mutable sequence.
 
     VimFold behaves like a slice of vim's current buffer. No slicing actually
-    occurs, however, unless explicitly requested through slice operations. All
+    occurs, however, unless explicitly requested through index operations. All
     other actions performed on folds modify the corresponding range in the
-    buffer directly while interfacing through fold-relative indices.
+    buffer directly, while letting users interface through 0-based indices.
 
     For example:
         >>> fold = VimFold(start=1, stop=4)
