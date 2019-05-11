@@ -1,4 +1,4 @@
-*vim-sort-folds*  SortFolds: sort vim folds based on their first line
+*vim-sort-folds*  Sort vim folds based on their first line
 
 ==============================================================================
                                                              *sortfolds-usage*
