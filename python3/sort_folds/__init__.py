@@ -20,7 +20,7 @@ def sort_folds(line_index_key=0):
         fold_lines_to_reorder = []
         for old_fold, new_fold in zip(folds, sorted_folds):
             if old_fold != new_fold:
-                fold_lines_to_reorder.append((old_fold, new_fold[:]))
+                fold_lines_to_reorder.append((old_fold, new_fold.lines))
         for old_fold, new_lines in reversed(fold_lines_to_reorder):
             old_fold[:] = new_lines
         present_result()
