@@ -7,9 +7,9 @@ class VimFold(collections.abc.MutableSequence):  # pylint: disable=too-many-ance
     """Interface for working with vim folds as if they were a mutable sequence.
 
     VimFold behaves like a slice of vim's current buffer. No slicing actually
-    occurs, however, unless explicitly requested through slice operations. All
+    occurs, however, unless explicitly requested through index operations. All
     other actions performed on folds modify the corresponding range in the
-    buffer directly while interfacing through fold-relative indices.
+    buffer directly, while letting users interface through 0-based indices.
 
     For example:
         >>> fold = VimFold(start=1, stop=4)
@@ -45,8 +45,8 @@ class VimFold(collections.abc.MutableSequence):  # pylint: disable=too-many-ance
         return self._stop
 
     def __repr__(self):
-        class_qualname = self.__class__.__qualname__
-        return f'{class_qualname}(start={self._start}, stop={self._stop})'
+        cls = self.__class__.__qualname__
+        return f'{cls}(start={self._start}, stop={self._stop})'
 
     __hash__ = None
 
@@ -78,7 +78,6 @@ class VimFold(collections.abc.MutableSequence):  # pylint: disable=too-many-ance
             value: str.
         """
         vim.current.buffer.insert(self._abs(index), value)
-        self._stop += 1
 
     def _abs_key(self, key):
         """Returns absolute value of the fold-relative key.
@@ -107,9 +106,9 @@ class VimFold(collections.abc.MutableSequence):  # pylint: disable=too-many-ance
         Raises:
             IndexError: the relative index is out of the fold's range.
         """
-        if not -len(self) <= idx < len(self):
-            raise IndexError('list index out of range')
-        return self._abs(idx)
+        if -len(self) <= idx < len(self):
+            return self._abs(idx)
+        raise IndexError('list index out of range')
 
     def _abs_slice(self, sli):
         """Returns absolute value of the fold-relative slice.
@@ -133,5 +132,5 @@ class VimFold(collections.abc.MutableSequence):  # pylint: disable=too-many-ance
         Returns:
             int. The corresponding position in vim's current buffer.
         """
-        abs_pos = max(pos + len(self), 0) if pos < 0 else min(pos, len(self))
+        abs_pos = max(0, pos + len(self)) if pos < 0 else min(pos, len(self))
         return self._start + abs_pos
