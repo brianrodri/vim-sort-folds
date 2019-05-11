@@ -12,7 +12,7 @@ class VimFold(collections.abc.MutableSequence):  # pylint: disable=too-many-ance
     buffer directly.
 
     Example:
-        >>> fold = Fold(start=1, stop=4)
+        >>> fold = VimFold(start=1, stop=4)
         >>> fold.insert(0, 'something')
         >>> vim.current.buffer[1]
         'something'
