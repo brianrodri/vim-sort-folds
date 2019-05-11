@@ -11,7 +11,7 @@ def sort_folds(line_index_key=0):
     """Sorts the top-level folds intersecting vim's currently selected range.
 
     Args:
-        line_index_key: int. The index of the line to use as a folds' key.
+        line_index_key: int. The index of the line to use as a fold's key.
     """
     with cursor.cursor_restorer():
         folds = [fold.VimFold(*line_nums) for line_nums in cursor.walk_folds()]
