@@ -3,18 +3,11 @@
 ==============================================================================
                                                              *sortfolds-usage*
 Usage ~
-
-Sorting |folds| is not easily possible in vanilla vim. You could join all
-lines in a fold, sort and split them up again; however, it is time consuming
-and tedious.
-
-This little plugin solves that issue: It sorts a visually selected region
-while keeping closed folds intact. Since folds can be created in a variety of
-ways (|fold-methods|), it is therefore straight-forward to sort arbitrary
-groups of text based on their first line.
-
-My personal use-case is to sort the plugins I keep in my vimrc.
-
+>
+Visually select the folds you'd like to be sorted, then:
+>
+ :call sortfolds#SortFolds()
+>
 ==============================================================================
                                                       *sortfolds-requirements*
 Requirements ~
