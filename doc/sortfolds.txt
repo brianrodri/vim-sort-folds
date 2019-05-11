@@ -7,7 +7,7 @@ Usage ~
 Visually select the folds you'd like to be sorted, then:
 >
  :call sortfolds#SortFolds()
->
+<
 ==============================================================================
                                                       *sortfolds-requirements*
 Requirements ~
