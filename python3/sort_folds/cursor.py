@@ -16,16 +16,17 @@ class CursorRestorer(contextlib.ContextDecorator):
         vim.current.window.cursor = self._cursor_to_restore
 
 
+@CursorRestorer()
 def walk_folds():
     """Yields pairs of line numbers which enclose a fold in vim's current range.
 
     Yields:
         tuple(int, int). The starting (inclusive) and stopping (exclusive) line
-            numbers of a fold.
+            indices of a fold.
     """
     fold_start = move_to_start_of_first_fold()
     while fold_start is not None:
-        yield (fold_start, perform_motion('zo]z') + 1)
+        yield fold_start - 1, perform_motion('zo]z')
         next_fold_start = perform_motion('zj')
         if (next_fold_start != fold_start
                 and fold_level(next_fold_start) == fold_level(fold_start)
@@ -36,11 +37,11 @@ def walk_folds():
 
 
 def move_to_start_of_first_fold():
-    """Places cursor at the start of the first fold within vim's current range.
+    """Places cursor at start of the first fold within vim's current range.
 
     Returns:
-        int or None. Line number to the start of the first fold, or None if no
-            such fold exists.
+        int or None. Line number to the start of the first fold within vim's
+            current range, or None if there isn't one.
     """
     cur_line = perform_motion(f'{vim.current.range.start + 1}G')
     if fold_level(cur_line):
@@ -57,21 +58,20 @@ def move_to_start_of_first_fold():
 
 
 def perform_motion(motion):
-    """Performs the given vim motion.
+    """Performs the given vim-motion.
 
     Args:
-        motion: str or None. The vim motion to perform.
+        motion: str. The vim-motion to perform.
 
     Returns:
         int. The line number of the cursor after moving.
     """
-    if motion is not None:
-        vim.command(f'normal! {motion}')
+    vim.command(f'normal! {motion}')
     return int(vim.eval('line(".")'))
 
 
 def fold_level(line_num):
-    """Returns fold level of the given line number.
+    """Returns the fold-level of the given line number.
 
     Args:
         line_num: int.

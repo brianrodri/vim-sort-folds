@@ -8,13 +8,12 @@ __version__ = '1.0.0'
 
 
 def sort_folds(line_index_key=0):
-    """Sorts consecutive, equal-level folds in vim's currently selected range.
+    """Sorts the top-level folds within vim's currently selected range.
 
     Args:
-        line_index_key: int. Index into the folds' lines; used for comparison.
+        line_index_key: int. The index of the line to use as the folds' key.
     """
-    with cursor.CursorRestorer():
-        folds = [fold.VimFold(*line_nums) for line_nums in cursor.walk_folds()]
+    folds = [fold.VimFold(*line_nums) for line_nums in cursor.walk_folds()]
     if len(folds) > 1:
         sorted_folds = sorted(folds, key=lambda f: f[line_index_key].lower())
         fold_lines_to_reorder = []
@@ -27,7 +26,7 @@ def sort_folds(line_index_key=0):
 
 
 def present_result():
-    """Modify vim's fold level to present the sorted lines."""
+    """Modifies vim's fold level to present the sorted lines."""
     level = cursor.fold_level(cursor.perform_motion('zXzC'))
     if level > 1:
         vim.command(f'normal! {level - 1}zo')
