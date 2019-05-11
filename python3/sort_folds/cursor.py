@@ -1,4 +1,4 @@
-"""Utility classes and functions for working with vim's cursor."""
+"""Utility functions for working with vim's cursor."""
 import contextlib
 import vim  # pylint: disable=import-error
 
@@ -7,7 +7,7 @@ def walk_folds():
     """Yields pairs of line numbers which enclose a fold in vim's current range.
 
     Yields:
-        tuple(int, int). The starting (inclusive) and stopping (exclusive) line
+        tuple(int, int). The starting (inclusive) and stopping (exclusive)
             indices of a fold.
     """
     fold_start = move_to_start_of_first_fold()
