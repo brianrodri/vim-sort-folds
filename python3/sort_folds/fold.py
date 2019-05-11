@@ -133,5 +133,5 @@ class VimFold(collections.abc.MutableSequence):  # pylint: disable=too-many-ance
         Returns:
             int. The corresponding position in vim's current buffer.
         """
-        abs_pos = max(pos + len(self), 0) if pos < 0 else min(pos, len(self))
+        abs_pos = max(0, pos + len(self)) if pos < 0 else min(pos, len(self))
         return self._start + abs_pos
