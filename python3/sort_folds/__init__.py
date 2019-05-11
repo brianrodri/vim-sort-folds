@@ -4,7 +4,7 @@ from sort_folds import fold
 import vim  # pylint: disable=import-error
 
 __all__ = ['sort_folds']
-__version__ = '0.1.0'
+__version__ = '0.2.0'
 
 
 def sort_folds(line_index_key=0):
