@@ -1,8 +1,8 @@
 # `vim-sort-folds`
 
-## Overview
-
 ![](https://raw.github.com/obreitwi/vim-sort-folds/master/doc/demo.gif)
+
+## Overview
 
 Sorting folds is way too tedious in vanilla vim; it requires us to:
  1. Join the lines of each fold
