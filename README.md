@@ -4,14 +4,14 @@
 
 ![](https://raw.github.com/obreitwi/vim-sort-folds/master/doc/demo.gif)
 
-Sorting folds is tedious in vanilla vim. It requires us to:
+Sorting folds is way too tedious in vanilla vim; it requires us to:
  1. Join the lines of each fold
  2. Sort the joined lines
  3. Split the lines back up
 
-This is much more involved than most other things vim allows us to do...
+`vim-sort-folds` aims to simplify the task by introducing a command to sort the folds of a visually selected region.
 
-**Enter: `vim-sort-folds`!** It aims to solve this issue by introducing a command to sort the folds of a visually selected region. Since folds can be created in a variety of ways, this can be especially handy for sorting arbitrary groups of content based on their first line.
+Since folds can be created in a variety of ways, this can be especially handy for sorting arbitrary groups of content based on their first line.
 
 
 ## Installation
