@@ -12,6 +12,15 @@ Sorting folds is way too tedious in vanilla vim... we're forced to:
 Since folds can be created in a variety of ways, this can be especially handy for sorting arbitrary groups of content based on their first line.
 
 
+## Usage
+
+ 1. Enter visual mode
+ 2. Select the folds you want sorted
+ 3. Call `sortfolds#SortFolds`
+ 
+If you find yourself doing this frequently enough, you can even bind it to a command to speed things up even further!
+
+
 ## Installation
 
 `vim-sort-folds` is compatible with most of the commonly used plugin managers for vim. Just drop something like the following lines somewhere in your `.vimrc`:
