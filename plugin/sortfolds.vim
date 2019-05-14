@@ -19,6 +19,7 @@ let g:loaded_sortfolds = 1
 if !has('python3')
   echohl WarningMsg
   echom 'vim-sort-folds requires +python3.'
+  call s:RestoreCpo()
   finish
 endif
 
