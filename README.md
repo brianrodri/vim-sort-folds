@@ -3,7 +3,7 @@
 ![](https://raw.github.com/obreitwi/vim-sort-folds/master/doc/demo.gif)
 
 Sorting folds is way too tedious in vanilla vim... We're forced to:
- 1. Join the lines of each individual into one
+ 1. Join the lines of each individual fold into one
  2. Run `:sort` on them
  3. Split the lines back up
 
@@ -16,9 +16,8 @@ groups of content based on their first line.
 
 ## Usage
 
- 1. Enter visual mode
- 2. Select the folds you'd like to sort
- 3. `:call sortfolds#SortFolds()`
+ 1. Visually select the folds you'd like to sort
+ 2. `:call sortfolds#SortFolds()`
 
 If you find yourself doing this frequently enough, you can bind it to a command and speed things up
 even further!
