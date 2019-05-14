@@ -12,7 +12,7 @@ def sort_folds():
     with cursor.cursor_restorer():
         folds = [fold.VimFold(*line_nums) for line_nums in cursor.walk_folds()]
     if len(folds) > 1:
-        sorted_folds = sorted(folds, key=lambda f: f[0].lower())
+        sorted_folds = sorted(folds, key=lambda fold: fold[0].lower())
         fold_lines_to_reorder = []
         for old_fold, new_fold in zip(folds, sorted_folds):
             if old_fold != new_fold:
