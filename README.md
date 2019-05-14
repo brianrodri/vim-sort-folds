@@ -25,7 +25,7 @@ If you find yourself doing this frequently enough, you can bind it to a command 
 
 `vim-sort-folds` is compatible with most plugin managers. Just drop something like the following into your `.vimrc`:
 
- - [vim-plug](https://github.com/junegunn/vim-plug): `Plug 'brianrodri/vim-sort-folds'`
- - [Vundle](https://github.com/VundleVim/Vundle.vim): `Plugin 'brianrodri/vim-sort-folds'`
+ - **[vim-plug](https://github.com/junegunn/vim-plug):** `Plug 'brianrodri/vim-sort-folds'`
+ - **[Vundle](https://github.com/VundleVim/Vundle.vim):** `Plugin 'brianrodri/vim-sort-folds'`
 
-_**NOTE**: this plugin (unapologetically) requires `+python3`._
+_**NOTE:** this plugin (unapologetically) requires `+python3`._
