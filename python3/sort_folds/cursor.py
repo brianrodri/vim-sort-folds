@@ -36,8 +36,7 @@ def move_to_start_of_first_fold():
         if fold_level(parent_fold_start) == fold_level(cur_line):
             return perform_motion('zo' '[z')
         return cur_line
-    with cursor_restorer():
-        first_fold_start = perform_motion('zj')
+    first_fold_start = perform_motion('zj')
     if first_fold_start != cur_line and in_vim_current_range(first_fold_start):
         return perform_motion('zj')
     return None

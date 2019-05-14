@@ -4,19 +4,15 @@ from sort_folds import fold
 import vim  # pylint: disable=import-error
 
 __all__ = ['sort_folds']
-__version__ = '0.2.0'
+__version__ = '0.2.1'
 
 
-def sort_folds(line_index_key=0):
-    """Sorts the top-level folds intersecting vim's currently selected range.
-
-    Args:
-        line_index_key: int. The index of the line to use as a fold's key.
-    """
+def sort_folds():
+    """Sorts the top-level folds intersecting vim's currently selected range."""
     with cursor.cursor_restorer():
         folds = [fold.VimFold(*line_nums) for line_nums in cursor.walk_folds()]
     if len(folds) > 1:
-        sorted_folds = sorted(folds, key=lambda f: f[line_index_key].lower())
+        sorted_folds = sorted(folds, key=lambda f: f[0].lower())
         fold_lines_to_reorder = []
         for old_fold, new_fold in zip(folds, sorted_folds):
             if old_fold != new_fold:

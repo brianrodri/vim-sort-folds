@@ -4,14 +4,16 @@
                                                              *sortfolds-usage*
 Usage ~
 
-Visually select the folds you'd like to sort, then:
->
- :call sortfolds#SortFolds()
-<
+ 1. Visually select the folds you'd like to sort
+ 2. `:call sortfolds#SortFolds()`
+
+If you find yourself doing this frequently enough, you can bind it to a
+command and speed things up even further!
+
 ==============================================================================
                                                       *sortfolds-requirements*
 Requirements ~
 
-This plugin requires |+python3| support enabled.
+This plugin requires vim to support |+python3|.
 
 vim: tw=78:ts=4:ft=help:norl:
