@@ -16,7 +16,7 @@ Since folds can be created in a variety of ways, this can be especially handy fo
 
  1. Enter visual mode
  2. Select the folds you want sorted
- 3. Call `sortfolds#SortFolds`
+ 3. `:call sortfolds#SortFolds()`
  
 If you find yourself doing this frequently enough, you can even bind it to a command to speed things up even further!
 
