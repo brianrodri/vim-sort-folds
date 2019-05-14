@@ -1,4 +1,4 @@
-"""Utility class for working with vim folds."""
+"""Utility module to make modifying folds in vim pythonic."""
 import collections
 import vim  # pylint: disable=import-error
 
