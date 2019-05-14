@@ -30,4 +30,4 @@ into your `.vimrc`:
  - **[vim-plug](https://github.com/junegunn/vim-plug):** `Plug 'brianrodri/vim-sort-folds'`
  - **[Vundle](https://github.com/VundleVim/Vundle.vim):** `Plugin 'brianrodri/vim-sort-folds'`
 
-_**NOTE:** this plugin (unapologetically) requires `+python3`._
+_**NOTE:** This plugin (unapologetically) requires `+python3`._
