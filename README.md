@@ -7,7 +7,7 @@ Sorting folds is way too tedious in vanilla vim... we're forced to:
  2. Sort the joined lines
  3. Split the lines back up
 
-`vim-sort-folds` aims to help by introducing a function, `sortfolds#SortFolds`, which sorts folds in a visually-selected region.
+`vim-sort-folds` aims to help by introducing a function, `sortfolds#SortFolds`, to sort the folds of a visual selection.
 
 Since folds can be created in a variety of ways, this can be especially handy for sorting arbitrary groups of content based on their first line.
 
