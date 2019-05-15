@@ -1,24 +1,33 @@
 # `vim-sort-folds`
 
-## Overview
-
 ![](https://raw.github.com/obreitwi/vim-sort-folds/master/doc/demo.gif)
 
-Sorting folds is tedious in vanilla vim. It requires us to:
- 1. Join the lines of each fold
- 2. Sort the joined lines
+Sorting folds is way too tedious in vanilla vim... We're forced to:
+ 1. Join the lines of each individual fold into one
+ 2. Run `:sort` on them
  3. Split the lines back up
 
-This is much more involved than most other things vim allows us to do...
+`vim-sort-folds` aims to help by introducing a function, `sortfolds#SortFolds`, to sort the folds of
+a visual selection all at once.
 
-**Enter: `vim-sort-folds`!** It aims to solve this issue by introducing a command to sort the folds of a visually selected region. Since folds can be created in a variety of ways, this can be especially handy for sorting arbitrary groups of content based on their first line.
+Since folds can be created in a variety of ways, this can be especially handy for sorting arbitrary
+groups of content based on their first line.
+
+
+## Usage
+
+ 1. Visually select the folds you'd like to sort
+ 2. `:call sortfolds#SortFolds()`
+
+If you find yourself doing this frequently enough, you can bind it to a command and speed things up
+even further!
 
 
 ## Installation
 
-`vim-sort-folds` is compatible with most of the commonly used plugin managers for vim. Just drop something like the following lines somewhere in your `.vimrc`:
+`vim-sort-folds` is compatible with most plugin managers. Just drop something like the following
+into your `.vimrc`:
+ - **[vim-plug](https://github.com/junegunn/vim-plug):** `Plug 'brianrodri/vim-sort-folds'`
+ - **[Vundle](https://github.com/VundleVim/Vundle.vim):** `Plugin 'brianrodri/vim-sort-folds'`
 
- - `Plug 'brianrodri/vim-sort-folds'` (for [vim-plug](https://github.com/junegunn/vim-plug))
- - `Plugin 'brianrodri/vim-sort-folds'` (for [Vundle](https://github.com/VundleVim/Vundle.vim))
-
-_**NOTE**: this plugin (unapologetically) requires `+python3`._
+_**NOTE:** This plugin (unapologetically) requires `+python3`._

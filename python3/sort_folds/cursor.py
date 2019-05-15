@@ -29,15 +29,14 @@ def move_to_start_of_first_fold():
         int or None. Line number to the start of the first fold within vim's
             current range, or None if there isn't one.
     """
-    cur_line = perform_motion('`<')
+    cur_line = line_number()
     if fold_level(cur_line):
         with cursor_restorer():
             parent_fold_start = perform_motion('zo' '[z')
         if fold_level(parent_fold_start) == fold_level(cur_line):
             return perform_motion('zo' '[z')
         return cur_line
-    with cursor_restorer():
-        first_fold_start = perform_motion('zj')
+    first_fold_start = perform_motion('zj')
     if first_fold_start != cur_line and in_vim_current_range(first_fold_start):
         return perform_motion('zj')
     return None
@@ -63,6 +62,15 @@ def perform_motion(motion):
         int. The line number of the cursor after moving.
     """
     vim.command(f'normal! {motion}')
+    return line_number()
+
+
+def line_number():
+    """Returns the line number vim's cursor is currently on.
+
+    Returns:
+        int.
+    """
     return int(vim.eval('line(".")'))
 
 

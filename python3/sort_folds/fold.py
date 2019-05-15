@@ -1,4 +1,4 @@
-"""Utility class for working with vim folds."""
+"""Utility module to make modifying folds in vim pythonic."""
 import collections
 import vim  # pylint: disable=import-error
 
@@ -11,7 +11,7 @@ class VimFold(collections.abc.MutableSequence):  # pylint: disable=too-many-ance
     other actions performed on folds modify the corresponding range in the
     buffer directly, while letting users interface through 0-based indices.
 
-    For example:
+    Example:
         >>> fold = VimFold(start=1, stop=4)
         >>> fold.insert(0, 'something')
         >>> vim.current.buffer[1]

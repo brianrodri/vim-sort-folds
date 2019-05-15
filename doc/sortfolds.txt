@@ -1,24 +1,19 @@
-*vim-sort-folds*  Sort vim folds based on their first line
+*vim-sort-folds*	Sort vim folds based on their first line
 
 ==============================================================================
                                                              *sortfolds-usage*
 Usage ~
 
-Sorting |folds| is not easily possible in vanilla vim. You could join all
-lines in a fold, sort and split them up again; however, it is time consuming
-and tedious.
+ 1. Visually select the folds you'd like to sort
+ 2. `:call sortfolds#SortFolds()`
 
-This little plugin solves that issue: It sorts a visually selected region
-while keeping closed folds intact. Since folds can be created in a variety of
-ways (|fold-methods|), it is therefore straight-forward to sort arbitrary
-groups of text based on their first line.
-
-My personal use-case is to sort the plugins I keep in my vimrc.
+If you find yourself doing this frequently enough, you can bind it to a
+command and speed things up even further!
 
 ==============================================================================
                                                       *sortfolds-requirements*
 Requirements ~
 
-This plugin requires |+python3| support enabled.
+This plugin requires vim to support |+python3|.
 
 vim: tw=78:ts=4:ft=help:norl:
