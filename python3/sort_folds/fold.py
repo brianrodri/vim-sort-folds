@@ -1,4 +1,4 @@
-"""Utility module to make modifying folds in vim pythonic."""
+"""Utility module to help modify the folds of vim in a Pythonic way."""
 import collections
 import vim  # pylint: disable=import-error
 
@@ -7,15 +7,27 @@ class VimFold(collections.abc.MutableSequence):  # pylint: disable=too-many-ance
     """Interface for working with vim folds as if they were a mutable sequence.
 
     VimFold behaves like a slice of vim's current buffer. No slicing actually
-    occurs, however, unless explicitly requested through index operations. All
-    other actions performed on folds modify the corresponding range in the
-    buffer directly, while letting users interface through 0-based indices.
+    occurs, however, unless slices are the expected return value.
+
+    All actions performed on folds act directly on the corresponding range in
+    vim's current buffer.
 
     Example:
+        >>> vim.current.buffer = ['A', 'B', 'C', 'D', 'E']
         >>> fold = VimFold(start=1, stop=4)
-        >>> fold.insert(0, 'something')
-        >>> vim.current.buffer[1]
-        'something'
+        >>> fold[-1]
+        'D'
+        >>> fold.insert(0, 'Bee')
+        >>> vim.current.buffer
+        ['A', 'Bee', 'B', 'C', 'D', 'E']
+        >>> del fold[1]
+        >>> vim.current.buffer
+        ['A', 'Bee', 'C', 'D', 'E']
+        >>> fold[2] = 'Dee'
+        >>> vim.current.buffer
+        ['A', 'Bee', 'C', 'Dee', 'E']
+        >>> fold[-2:]
+        ['C', 'Dee']
     """
 
     def __init__(self, start, stop):
@@ -28,7 +40,7 @@ class VimFold(collections.abc.MutableSequence):  # pylint: disable=too-many-ance
                 fold stops.
 
         Raises:
-            IndexError: range is invalid.
+            IndexError: The range is invalid.
         """
         if start > stop:
             raise IndexError(f'range is invalid: start={start} > stop={stop}')
@@ -36,17 +48,17 @@ class VimFold(collections.abc.MutableSequence):  # pylint: disable=too-many-ance
 
     @property
     def start(self):
-        """Provides read-only access to start index."""
+        """Provides read-only access to the start index."""
         return self._start
 
     @property
     def stop(self):
-        """Provides read-only access to stop index."""
+        """Provides read-only access to the stop index."""
         return self._stop
 
     def __repr__(self):
-        cls = self.__class__.__qualname__
-        return f'{cls}(start={self._start}, stop={self._stop})'
+        pretty_class_name = self.__class__.__qualname__
+        return f'{pretty_class_name}(start={self._start}, stop={self._stop})'
 
     __hash__ = None
 
@@ -71,66 +83,67 @@ class VimFold(collections.abc.MutableSequence):  # pylint: disable=too-many-ance
         del vim.current.buffer[self._abs_key(key)]
 
     def insert(self, index, value):
-        """Inserts value into vim's current buffer at the fold-relative index.
+        """Inserts a value into vim's current buffer at the fold-relative index.
 
         Args:
             index: int.
-            value: str.
+            value: *.
         """
-        vim.current.buffer.insert(self._abs(index), value)
+        vim.current.buffer.insert(self._abs_position(index), value)
 
-    def _abs_key(self, key):
-        """Returns absolute value of the fold-relative key.
+    def _abs_key(self, k):
+        """Returns corresponding key with respect to vim's current buffer.
 
         Args:
-            key: *.
+            k: *. A key into the lines of self's fold.
 
         Returns:
             *. A corresponding key into vim's current buffer.
         """
-        if isinstance(key, int):
-            return self._abs_index(key)
-        if isinstance(key, slice):
-            return self._abs_slice(key)
-        return key
+        if isinstance(k, int):
+            return self._abs_index(k)
+        if isinstance(k, slice):
+            return self._abs_slice(k)
+        return k
 
-    def _abs_index(self, idx):
-        """Returns absolute value of the fold-relative index.
+    def _abs_index(self, i):
+        """Returns corresponding index with respect to vim's current buffer.
 
         Args:
-            idx: int.
+            i: int. An index into the lines of self's fold.
 
         Returns:
             int. A corresponding index into vim's current buffer.
 
         Raises:
-            IndexError: the relative index is out of the fold's range.
+            IndexError: The index is out of the fold's range.
         """
-        if -len(self) <= idx < len(self):
-            return self._abs(idx)
-        raise IndexError('list index out of range')
+        if -len(self) <= i < len(self):
+            return self._abs_position(i)
+        raise IndexError(f'list index={i} out of range')
 
-    def _abs_slice(self, sli):
-        """Returns absolute value of the fold-relative slice.
+    def _abs_slice(self, s):
+        """Returns corresponding slice with respect to vim's current buffer.
 
         Args:
-            sli: slice.
+            s: slice. A slice into the lines of self's fold.
 
         Returns:
             slice. A corresponding slice into vim's current buffer.
         """
-        return slice(self._start if sli.start is None else self._abs(sli.start),
-                     self._stop if sli.stop is None else self._abs(sli.stop),
-                     sli.step)
+        return slice(
+            self._start if s.start is None else self._abs_position(s.start),
+            self._stop if s.stop is None else self._abs_position(s.stop),
+            s.step)
 
-    def _abs(self, pos):
-        """Returns absolute value of the fold-relative position.
+    def _abs_position(self, p):
+        """Returns corresponding position with respect to vim's current buffer.
 
         Args:
-            pos: int.
+            p: int. A position into the lines of self's fold.
 
         Returns:
-            int. The corresponding position in vim's current buffer.
+            int. A corresponding position into vim's current buffer.
         """
-        abs_pos = max(0, pos + len(self)) if pos < 0 else min(pos, len(self))
-        return self._start + abs_pos
+        abs_position = max(0, p + len(self)) if p < 0 else min(p, len(self))
+        return self._start + abs_position
