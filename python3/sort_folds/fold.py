@@ -91,26 +91,26 @@ class VimFold(collections.abc.MutableSequence):  # pylint: disable=too-many-ance
         """
         vim.current.buffer.insert(self._abs_position(index), value)
 
-    def _abs_key(self, k):
+    def _abs_key(self, key):
         """Returns corresponding key with respect to vim's current buffer.
 
         Args:
-            k: *. A key into the lines of self's fold.
+            key: *. A key into the lines of self's fold.
 
         Returns:
             *. A corresponding key into vim's current buffer.
         """
-        if isinstance(k, int):
-            return self._abs_index(k)
-        if isinstance(k, slice):
-            return self._abs_slice(k)
-        return k
+        if isinstance(key, int):
+            return self._abs_index(key)
+        if isinstance(key, slice):
+            return self._abs_slice(key)
+        return key
 
-    def _abs_index(self, i):
+    def _abs_index(self, idx):
         """Returns corresponding index with respect to vim's current buffer.
 
         Args:
-            i: int. An index into the lines of self's fold.
+            idx: int. An index into the lines of self's fold.
 
         Returns:
             int. A corresponding index into vim's current buffer.
@@ -118,32 +118,32 @@ class VimFold(collections.abc.MutableSequence):  # pylint: disable=too-many-ance
         Raises:
             IndexError: The index is out of the fold's range.
         """
-        if -len(self) <= i < len(self):
-            return self._abs_position(i)
-        raise IndexError(f'list index={i} out of range')
+        if -len(self) <= idx < len(self):
+            return self._abs_position(idx)
+        raise IndexError(f'list index={idx} out of range')
 
-    def _abs_slice(self, s):
+    def _abs_slice(self, sli):
         """Returns corresponding slice with respect to vim's current buffer.
 
         Args:
-            s: slice. A slice into the lines of self's fold.
+            sli: slice. A slice into the lines of self's fold.
 
         Returns:
             slice. A corresponding slice into vim's current buffer.
         """
         return slice(
-            self._start if s.start is None else self._abs_position(s.start),
-            self._stop if s.stop is None else self._abs_position(s.stop),
-            s.step)
+            self._start if sli.start is None else self._abs_position(sli.start),
+            self._stop if sli.stop is None else self._abs_position(sli.stop),
+            sli.step)
 
-    def _abs_position(self, p):
+    def _abs_position(self, pos):
         """Returns corresponding position with respect to vim's current buffer.
 
         Args:
-            p: int. A position into the lines of self's fold.
+            pos: int. A position into the lines of self's fold.
 
         Returns:
             int. A corresponding position into vim's current buffer.
         """
-        abs_position = max(0, p + len(self)) if p < 0 else min(p, len(self))
-        return self._start + abs_position
+        abs_pos = max(0, pos + len(self)) if pos < 0 else min(pos, len(self))
+        return self._start + abs_pos
