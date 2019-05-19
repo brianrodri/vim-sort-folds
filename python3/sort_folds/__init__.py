@@ -4,7 +4,7 @@ from sort_folds import fold
 import vim  # pylint: disable=import-error
 
 __all__ = ['sort_folds']
-__version__ = '0.2.1'
+__version__ = '0.2.2'
 
 
 def sort_folds():
@@ -18,7 +18,7 @@ def sort_folds():
             if old_fold != new_fold:
                 fold_lines_to_reorder.append((old_fold, new_fold[:]))
         for old_fold, new_lines in reversed(fold_lines_to_reorder):
-            old_fold[:] = new_lines
+            vim.current.buffer[old_fold.slice] = new_lines
         present_result()
 
 

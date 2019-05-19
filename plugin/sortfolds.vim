@@ -1,6 +1,6 @@
 " vim-sort-folds - Sort vim folds based on their first line.
 " Maintainer:   Brian Rodriguez <brian@brianrodri.com>
-" Version:      0.2.1
+" Version:      0.2.2
 " License:      MIT license
 let s:save_cpo = &cpo
 set cpo&vim
