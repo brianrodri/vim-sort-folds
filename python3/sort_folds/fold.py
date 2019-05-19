@@ -1,30 +1,36 @@
-"""Utility module to make modifying folds in vim pythonic."""
+"""Utility module to make working with vim folds more pythonic."""
 import collections
 import vim  # pylint: disable=import-error
 
 
-class VimFold(collections.abc.MutableSequence):  # pylint: disable=too-many-ancestors
-    """Interface for working with vim folds as if they were a mutable sequence.
+class VimFold(collections.abc.Sequence):
+    """Interface for working with vim folds as if they were a sequence.
 
     VimFold behaves like a slice of vim's current buffer. No slicing actually
-    occurs, however, unless explicitly requested through index operations. All
-    other actions performed on folds modify the corresponding range in the
+    occurs, however, until explicitly requested by index operations.
+
+    All actions performed on folds reference the corresponding range in the
     buffer directly, while letting users interface through 0-based indices.
 
+    IMPORTANT: VimFold makes no effort to keep track of any changes to vim's
+    current buffer.
+
     Example:
-        >>> fold = VimFold(start=1, stop=4)
-        >>> fold.insert(0, 'something')
-        >>> vim.current.buffer[1]
-        'something'
+        >>> vim.current.buffer = ['A', '# {{{', 'B', '# }}}', 'C']
+        >>> fold = VimFold(start=1, stop=4)  # NOTE: No slices are created.
+        >>> fold[1]
+        'B'
+        >>> fold[:]  # NOTE: Creates an actual slice.
+        ['# {{{', 'B', '# }}}']
     """
 
     def __init__(self, start, stop):
         """Initializes a new instance from the given pair of indices.
 
         Args:
-            start: int. An (inclusive) index into vim's current buffer at which
-                a fold starts.
-            stop: int. An (exclusive) index into vim's current buffer at which a
+            start: int. Inclusive index into vim's current buffer at which a vim
+                fold starts.
+            stop: int. Exclusive index into vim's current buffer at which a vim
                 fold stops.
 
         Raises:
@@ -44,9 +50,14 @@ class VimFold(collections.abc.MutableSequence):  # pylint: disable=too-many-ance
         """Provides read-only access to stop index."""
         return self._stop
 
+    @property
+    def slice(self):
+        """Returns the slice into vim's current buffer which self spans over."""
+        return slice(self._start, self._stop, 1)
+
     def __repr__(self):
-        cls = self.__class__.__qualname__
-        return f'{cls}(start={self._start}, stop={self._stop})'
+        class_qual_name = self.__class__.__qualname__
+        return f'{class_qual_name}(start={self._start}, stop={self._stop})'
 
     __hash__ = None
 
@@ -64,21 +75,6 @@ class VimFold(collections.abc.MutableSequence):  # pylint: disable=too-many-ance
     def __getitem__(self, key):
         return vim.current.buffer[self._abs_key(key)]
 
-    def __setitem__(self, key, value):
-        vim.current.buffer[self._abs_key(key)] = value
-
-    def __delitem__(self, key):
-        del vim.current.buffer[self._abs_key(key)]
-
-    def insert(self, index, value):
-        """Inserts value into vim's current buffer at the fold-relative index.
-
-        Args:
-            index: int.
-            value: str.
-        """
-        vim.current.buffer.insert(self._abs(index), value)
-
     def _abs_key(self, key):
         """Returns absolute value of the fold-relative key.
 
@@ -89,9 +85,9 @@ class VimFold(collections.abc.MutableSequence):  # pylint: disable=too-many-ance
             *. A corresponding key into vim's current buffer.
         """
         if isinstance(key, int):
-            return self._abs_index(key)
-        if isinstance(key, slice):
-            return self._abs_slice(key)
+            key = self._abs_index(key)
+        elif isinstance(key, slice):
+            key = self._abs_slice(key)
         return key
 
     def _abs_index(self, idx):
